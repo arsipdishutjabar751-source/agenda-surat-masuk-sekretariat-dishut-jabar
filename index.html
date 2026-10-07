@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agenda Surat Masuk – SEKRETARIAT Dinas Kehutanan Provinsi Jawa Barat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0d6e5f;
+      --primary-dark: #0a5549;
+      --primary-light: #e8f5f2;
+      --accent: #f59e0b;
+      --bg: #f0f7f5;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --danger: #ef4444;
+      --undangan: #ec4899;
+      --biasa: #3b82f6;
+      --permohonan: #f59e0b;
+      --penting: #ef4444;
+      --segera: #8b5cf6;
+      --rahasia: #1e293b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .logo {
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    .header h1 { font-size: 1.15rem; font-weight: 700; line-height: 1.2; }
+    .header p { font-size: 0.75rem; opacity: 0.85; }
+    .stats {
+      display: flex;
+      gap: 0.6rem;
+    }
+    .stat-box {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      border-radius: 10px;
+      padding: 0.4rem 0.9rem;
+      text-align: center;
+      min-width: 70px;
+    }
+    .stat-box .num { font-size: 1.25rem; font-weight: 700; display: block; }
+    .stat-box .label { font-size: 0.65rem; opacity: 0.85; }
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-primary { background: white; color: var(--primary); }
+    .btn-primary:hover { background: #f0fdf9; transform: translateY(-1px); }
+    .btn-outline { background: transparent; color: white; border: 1.5px solid rgba(255,255,255,0.5); }
+    .btn-outline:hover { background: rgba(255,255,255,0.15); }
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: #f1f5f9;
+      color: var(--muted);
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .tab.active { background: var(--primary); color: white; }
+    .tab:hover:not(.active) { background: #e2e8f0; }
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 0.6rem;
+      padding: 0.85rem 1.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+      background: white;
+      border-bottom: 1px solid var(--border);
+    }
+    .search-box {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 0.55rem 1rem 0.55rem 2.4rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .search-box input:focus { border-color: var(--primary); }
+    .search-box::before {
+      content: "🔍";
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.9rem;
+    }
+    select {
+      padding: 0.55rem 0.9rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: white;
+      cursor: pointer;
+      outline: none;
+    }
+    select:focus { border-color: var(--primary); }
+    /* Table */
+    .table-wrap {
+      overflow-x: auto;
+      padding: 0 1.5rem 2rem;
+      margin-top: 0.5rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      font-size: 0.85rem;
+    }
+    thead {
+      background: #f8fafc;
+      position: sticky;
+      top: 0;
+    }
+    th {
+      padding: 0.75rem 0.85rem;
+      text-align: left;
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+    th:hover { color: var(--primary); }
+    td {
+      padding: 0.7rem 0.85rem;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: top;
+    }
+    tr:hover td { background: #f8fafc; }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-undangan { background: #fce7f3; color: #be185d; }
+    .badge-biasa { background: #dbeafe; color: #1d4ed8; }
+    .badge-permohonan { background: #fef3c7; color: #b45309; }
+    .badge-penting { background: #fee2e2; color: #b91c1c; }
+    .badge-segera { background: #ede9fe; color: #6d28d9; }
+    .badge-rahasia { background: #1e293b; color: white; }
+    .badge-edaran { background: #ccfbf1; color: #0f766e; }
+    .badge-default { background: #f1f5f9; color: #475569; }
+    .scan-link {
+      color: var(--primary);
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.8rem;
+    }
+    .scan-link:hover { text-decoration: underline; }
+    .disposisi {
+      font-size: 0.8rem;
+      color: var(--muted);
+      max-width: 140px;
+    }
+    .isi-ringkas {
+      max-width: 220px;
+      line-height: 1.4;
+    }
+    .asal {
+      max-width: 180px;
+      line-height: 1.35;
+    }
+    /* Pagination */
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .page-info { font-size: 0.85rem; color: var(--muted); }
+    .page-btns { display: flex; gap: 0.4rem; }
+    .page-btn {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .page-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+    .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--muted);
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid #e2e8f0;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: white;
+      border-radius: 16px;
+      max-width: 560px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .modal-header {
+      padding: 1.1rem 1.4rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h2 { font-size: 1.1rem; }
+    .modal-close {
+      background: none; border: none;
+      font-size: 1.4rem; cursor: pointer;
+      color: var(--muted); line-height: 1;
+    }
+    .modal-body { padding: 1.2rem 1.4rem; }
+    .detail-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 0.4rem;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.9rem;
+    }
+    .detail-label { color: var(--muted); font-weight: 500; }
+    .detail-value { font-weight: 500; word-break: break-word; }
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header { padding: 0.7rem 1rem; }
+      .stats { order: 3; width: 100%; justify-content: center; }
+      .filters { padding: 0.7rem 1rem; }
+      .table-wrap { padding: 0 0.5rem 1.5rem; }
+      th, td { padding: 0.55rem 0.5rem; font-size: 0.8rem; }
+      .detail-row { grid-template-columns: 1fr; gap: 0.1rem; }
+    }
+    .empty { text-align: center; padding: 3rem; color: var(--muted); }
+    .no-col { display: none; }
+    @media (min-width: 1100px) {
+      .no-col { display: table-cell; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">📋</div>
+      <div>
+        <h1>Agenda Surat Masuk</h1>
+        <p>SEKRETARIAT · Dinas Kehutanan Provinsi Jawa Barat</p>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat-box"><span class="num" id="statTotal">–</span><span class="label">Total</span></div>
+      <div class="stat-box"><span class="num" id="statFiltered">–</span><span class="label">Ditampilkan</span></div>
+      <div class="stat-box"><span class="num" id="statToday">–</span><span class="label">Hari ini</span></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary" onclick="refreshData()">↻ Refresh</button>
+      <button class="btn btn-outline" onclick="exportCSV()">↓ Export CSV</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="tabel" onclick="switchTab('tabel')">📋 Agenda Tabel</button>
+    <button class="tab" data-tab="undangan" onclick="switchTab('undangan')">📅 Undangan Hari Ini & Mendatang</button>
+  </div>
+
+  <div class="filters" id="filtersBar">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Cari nomor surat, asal, isi ringkas..." oninput="applyFilters()" />
+    </div>
+    <select id="filterJenis" onchange="applyFilters()">
+      <option value="">Semua Jenis</option>
+    </select>
+    <select id="filterDisposisi" onchange="applyFilters()">
+      <option value="">Semua Disposisi</option>
+    </select>
+    <select id="filterBulan" onchange="applyFilters()">
+      <option value="">Semua Bulan</option>
+    </select>
+    <select id="perPage" onchange="changePerPage()">
+      <option value="25">25 / halaman</option>
+      <option value="50" selected>50 / halaman</option>
+      <option value="100">100 / halaman</option>
+      <option value="200">200 / halaman</option>
+    </select>
+  </div>
+
+  <div id="content">
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      Memuat data dari Google Sheet...
+    </div>
+    <div class="table-wrap" id="tableSection" style="display:none;">
+      <table>
+        <thead>
+          <tr>
+            <th data-sort="no">No ↕</th>
+            <th data-sort="tgl">Tgl Terima ↕</th>
+            <th data-sort="jenis">Jenis ↕</th>
+            <th data-sort="nomor">Nomor Surat ↕</th>
+            <th data-sort="asal">Asal Surat ↕</th>
+            <th data-sort="isi">Isi Ringkas ↕</th>
+            <th data-sort="disposisi">Disposisi ↕</th>
+            <th>Scan</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="pagination" style="display:none;">
+      <div class="page-info" id="pageInfo"></div>
+      <div class="page-btns" id="pageBtns"></div>
+    </div>
+  </div>
+
+  <!-- Modal Detail -->
+  <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Detail Surat</h2>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    // ========== CONFIG ==========
+    const SHEET_ID = '1WSltmAZUBjhtEMZeYOjGm172lC_jSxrRNaLprHgeVkM';
+    const GID = '880071478';
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&tq=select%20*&gid=${GID}`;
+
+    // Column mapping (0-based index from gviz)
+    const COL = {
+      timestamp: 0,
+      nomorUrut: 1,
+      tglTerima: 2,
+      jenis: 3,
+      nomorSurat: 4,
+      asal: 5,
+      tglSurat: 6,
+      hariPelaksanaan: 7,
+      tglPelaksanaan: 8,
+      waktuPelaksanaan: 9,
+      tempat: 10,
+      ketTempat: 11,
+      isiRingkas: 12,
+      disposisiKadishut: 13,
+      catatanKadishut: 14,
+      scan: 15,
+      disposisiSekdishut: 16,
+      catatanSekdishut: 17,
+      nomorDishut: 18
+    };
+
+    let allData = [];
+    let filteredData = [];
+    let currentPage = 1;
+    let perPage = 50;
+    let sortKey = 'no';
+    let sortAsc = false;
+    let currentTab = 'tabel';
+
+    // ========== FETCH ==========
+    async function loadData() {
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('tableSection').style.display = 'none';
+      document.getElementById('pagination').style.display = 'none';
+      try {
+        const res = await fetch(SHEET_URL + '&_t=' + Date.now());
+        const text = await res.text();
+        const jsonStr = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?/)[1];
+        const data = JSON.parse(jsonStr);
+        const rows = data.table.rows || [];
+
+        allData = rows.map((r, idx) => {
+          const c = r.c || [];
+          const get = (i) => {
+            if (!c[i]) return '';
+            return (c[i].f !== undefined && c[i].f !== null) ? c[i].f : (c[i].v !== null && c[i].v !== undefined ? String(c[i].v) : '');
+          };
+          const getRaw = (i) => c[i] ? c[i].v : null;
+
+          const tglTerimaStr = get(COL.tglTerima);
+          const nomorUrut = parseFloat(get(COL.nomorUrut)) || (idx + 1);
+          return {
+            no: nomorUrut,
+            tglTerima: tglTerimaStr,
+            tglTerimaRaw: getRaw(COL.tglTerima),
+            jenis: get(COL.jenis) || 'Biasa',
+            nomorSurat: get(COL.nomorSurat),
+            asal: get(COL.asal),
+            tglSurat: get(COL.tglSurat),
+            hariPelaksanaan: get(COL.hariPelaksanaan),
+            tglPelaksanaan: get(COL.tglPelaksanaan),
+            waktuPelaksanaan: get(COL.waktuPelaksanaan),
+            tempat: get(COL.tempat),
+            ketTempat: get(COL.ketTempat),
+            isiRingkas: get(COL.isiRingkas),
+            disposisi: get(COL.disposisiKadishut) || get(COL.disposisiSekdishut) || '-',
+            catatan: get(COL.catatanKadishut) || get(COL.catatanSekdishut) || '',
+            scan: get(COL.scan),
+            timestamp: get(COL.timestamp),
+            _raw: r
+          };
+        }).filter(d => d.nomorSurat || d.isiRingkas); // skip empty
+
+        // Sort by no desc by default
+        allData.sort((a, b) => b.no - a.no);
+
+        buildFilterOptions();
+        applyFilters();
+        updateStats();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('loading').innerHTML = `
+          <p style="color:var(--danger);font-weight:600;">Gagal memuat data</p>
+          <p style="margin-top:0.5rem;font-size:0.9rem;">${err.message}</p>
+          <button class="btn btn-primary" style="margin-top:1rem;" onclick="loadData()">Coba Lagi</button>
+        `;
+      }
+    }
+
+    function buildFilterOptions() {
+      const jenisSet = new Set();
+      const dispSet = new Set();
+      const bulanSet = new Set();
+      allData.forEach(d => {
+        if (d.jenis) jenisSet.add(d.jenis);
+        if (d.disposisi && d.disposisi !== '-') {
+          d.disposisi.split(/[,;]/).forEach(x => {
+            const t = x.trim();
+            if (t) dispSet.add(t);
+          });
+        }
+        // Extract month from tglTerima (dd/MM/yyyy)
+        const m = d.tglTerima.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+        if (m) {
+          const bulanNama = ['', 'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+          bulanSet.add(`${m[3]}-${m[2]}|${bulanNama[parseInt(m[2],10)]} ${m[3]}`);
+        }
+      });
+
+      const jenisSel = document.getElementById('filterJenis');
+      jenisSel.innerHTML = '<option value="">Semua Jenis</option>';
+      [...jenisSet].sort().forEach(j => {
+        jenisSel.innerHTML += `<option value="${escapeHtml(j)}">${escapeHtml(j)}</option>`;
+      });
+
+      const dispSel = document.getElementById('filterDisposisi');
+      dispSel.innerHTML = '<option value="">Semua Disposisi</option>';
+      [...dispSet].sort().forEach(d => {
+        dispSel.innerHTML += `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`;
+      });
+
+      const bulanSel = document.getElementById('filterBulan');
+      bulanSel.innerHTML = '<option value="">Semua Bulan</option>';
+      [...bulanSet].sort().reverse().forEach(b => {
+        const [val, label] = b.split('|');
+        bulanSel.innerHTML += `<option value="${val}">${label}</option>`;
+      });
+    }
+
+    function applyFilters() {
+      const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      const jenis = document.getElementById('filterJenis').value;
+      const disp = document.getElementById('filterDisposisi').value;
+      const bulan = document.getElementById('filterBulan').value;
+
+      filteredData = allData.filter(d => {
+        if (jenis && d.jenis !== jenis) return false;
+        if (disp && !(d.disposisi || '').includes(disp)) return false;
+        if (bulan) {
+          const m = d.tglTerima.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+          if (!m || `${m[3]}-${m[2]}` !== bulan) return false;
+        }
+        if (q) {
+          const hay = `${d.nomorSurat} ${d.asal} ${d.isiRingkas} ${d.disposisi} ${d.no}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      // Apply sort
+      filteredData.sort((a, b) => {
+        let va = a[sortKey], vb = b[sortKey];
+        if (sortKey === 'no') { va = a.no; vb = b.no; }
+        if (typeof va === 'string') va = va.toLowerCase();
+        if (typeof vb === 'string') vb = vb.toLowerCase();
+        if (va < vb) return sortAsc ? -1 : 1;
+        if (va > vb) return sortAsc ? 1 : -1;
+        return 0;
+      });
+
+      currentPage = 1;
+      renderTable();
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('statTotal').textContent = allData.length.toLocaleString('id-ID');
+      document.getElementById('statFiltered').textContent = filteredData.length.toLocaleString('id-ID');
+      const today = new Date();
+      const todayStr = `${String(today.getDate()).padStart(2,'0')}/${String(today.getMonth()+1).padStart(2,'0')}/${today.getFullYear()}`;
+      const countToday = allData.filter(d => d.tglTerima.startsWith(todayStr) || d.tglTerima.includes(todayStr)).length;
+      // Also try matching format
+      const todayCount = allData.filter(d => {
+        const m = d.tglTerima.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+        if (!m) return false;
+        return parseInt(m[1]) === today.getDate() && parseInt(m[2]) === (today.getMonth()+1) && parseInt(m[3]) === today.getFullYear();
+      }).length;
+      document.getElementById('statToday').textContent = todayCount;
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      const start = (currentPage - 1) * perPage;
+      const pageData = filteredData.slice(start, start + perPage);
+
+      if (pageData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="empty">Tidak ada data yang cocok dengan filter.</td></tr>`;
+      } else {
+        tbody.innerHTML = pageData.map(d => `
+          <tr onclick="showDetail(${d.no})" style="cursor:pointer;">
+            <td><strong>${d.no}</strong></td>
+            <td>${escapeHtml(d.tglTerima)}</td>
+            <td>${badgeJenis(d.jenis)}</td>
+            <td style="font-family:monospace;font-size:0.8rem;">${escapeHtml(d.nomorSurat)}</td>
+            <td class="asal">${escapeHtml(truncate(d.asal, 40))}</td>
+            <td class="isi-ringkas">${escapeHtml(truncate(d.isiRingkas, 60))}</td>
+            <td class="disposisi">${escapeHtml(truncate(d.disposisi, 30))}</td>
+            <td>
+              ${d.scan ? `<a class="scan-link" href="${escapeHtml(d.scan)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Buka ↗</a>` : '–'}
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('tableSection').style.display = 'block';
+      document.getElementById('pagination').style.display = 'flex';
+      renderPagination();
+    }
+
+    function renderPagination() {
+      const totalPages = Math.max(1, Math.ceil(filteredData.length / perPage));
+      const start = (currentPage - 1) * perPage + 1;
+      const end = Math.min(currentPage * perPage, filteredData.length);
+      document.getElementById('pageInfo').textContent =
+        filteredData.length === 0 ? '0 data' : `Menampilkan ${start}–${end} dari ${filteredData.length.toLocaleString('id-ID')}`;
+
+      const btns = document.getElementById('pageBtns');
+      let html = `<button class="page-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="goPage(${currentPage-1})">‹</button>`;
+      const pages = getPageNumbers(currentPage, totalPages);
+      pages.forEach(p => {
+        if (p === '...') html += `<span style="padding:0 0.3rem;color:var(--muted);">…</span>`;
+        else html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`;
+      });
+      html += `<button class="page-btn" ${currentPage >= totalPages ? 'disabled' : ''} onclick="goPage(${currentPage+1})">›</button>`;
+      btns.innerHTML = html;
+    }
+
+    function getPageNumbers(current, total) {
+      if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+      const pages = [];
+      if (current <= 4) {
+        pages.push(1,2,3,4,5,'...',total);
+      } else if (current >= total - 3) {
+        pages.push(1,'...',total-4,total-3,total-2,total-1,total);
+      } else {
+        pages.push(1,'...',current-1,current,current+1,'...',total);
+      }
+      return pages;
+    }
+
+    function goPage(p) {
+      currentPage = p;
+      renderTable();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function changePerPage() {
+      perPage = parseInt(document.getElementById('perPage').value, 10);
+      currentPage = 1;
+      renderTable();
+    }
+
+    // Sort
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => {
+        const key = th.dataset.sort;
+        if (sortKey === key) sortAsc = !sortAsc;
+        else { sortKey = key; sortAsc = true; }
+        applyFilters();
+      });
+    });
+
+    function badgeJenis(j) {
+      const map = {
+        'Undangan': 'badge-undangan',
+        'Biasa': 'badge-biasa',
+        'Permohonan': 'badge-permohonan',
+        'Penting': 'badge-penting',
+        'Segera': 'badge-segera',
+        'Rahasia': 'badge-rahasia',
+        'Surat Edaran': 'badge-edaran'
+      };
+      const cls = map[j] || 'badge-default';
+      return `<span class="badge ${cls}">${escapeHtml(j)}</span>`;
+    }
+
+    function showDetail(no) {
+      const d = allData.find(x => x.no === no);
+      if (!d) return;
+      const body = document.getElementById('modalBody');
+      body.innerHTML = `
+        <div class="detail-row"><span class="detail-label">No. Urut</span><span class="detail-value">${d.no}</span></div>
+        <div class="detail-row"><span class="detail-label">Tgl Terima</span><span class="detail-value">${escapeHtml(d.tglTerima)}</span></div>
+        <div class="detail-row"><span class="detail-label">Jenis Surat</span><span class="detail-value">${badgeJenis(d.jenis)}</span></div>
+        <div class="detail-row"><span class="detail-label">Nomor Surat</span><span class="detail-value" style="font-family:monospace;">${escapeHtml(d.nomorSurat)}</span></div>
+        <div class="detail-row"><span class="detail-label">Asal Surat</span><span class="detail-value">${escapeHtml(d.asal)}</span></div>
+        <div class="detail-row"><span class="detail-label">Tanggal Surat</span><span class="detail-value">${escapeHtml(d.tglSurat)}</span></div>
+        <div class="detail-row"><span class="detail-label">Isi Ringkas</span><span class="detail-value">${escapeHtml(d.isiRingkas)}</span></div>
+        <div class="detail-row"><span class="detail-label">Disposisi</span><span class="detail-value">${escapeHtml(d.disposisi)}</span></div>
+        ${d.catatan ? `<div class="detail-row"><span class="detail-label">Catatan</span><span class="detail-value">${escapeHtml(d.catatan)}</span></div>` : ''}
+        ${d.hariPelaksanaan && d.hariPelaksanaan !== '-' ? `
+          <div class="detail-row"><span class="detail-label">Hari Pelaksanaan</span><span class="detail-value">${escapeHtml(d.hariPelaksanaan)}</span></div>
+          <div class="detail-row"><span class="detail-label">Tanggal Pelaksanaan</span><span class="detail-value">${escapeHtml(d.tglPelaksanaan)}</span></div>
+          <div class="detail-row"><span class="detail-label">Waktu</span><span class="detail-value">${escapeHtml(d.waktuPelaksanaan)}</span></div>
+          <div class="detail-row"><span class="detail-label">Tempat</span><span class="detail-value">${escapeHtml(d.tempat)} ${d.ketTempat && d.ketTempat !== '-' ? '· ' + escapeHtml(d.ketTempat) : ''}</span></div>
+        ` : ''}
+        <div class="detail-row"><span class="detail-label">Scan Surat</span><span class="detail-value">
+          ${d.scan ? `<a class="scan-link" href="${escapeHtml(d.scan)}" target="_blank" rel="noopener">Buka di Google Drive ↗</a>` : '–'}
+        </span></div>
+        <div class="detail-row"><span class="detail-label">Timestamp Input</span><span class="detail-value">${escapeHtml(d.timestamp)}</span></div>
+      `;
+      document.getElementById('modalOverlay').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('show');
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+      if (tab === 'undangan') {
+        // Filter undangan with future or today execution date
+        document.getElementById('filterJenis').value = 'Undangan';
+        applyFilters();
+      } else {
+        document.getElementById('filterJenis').value = '';
+        applyFilters();
+      }
+    }
+
+    function refreshData() {
+      loadData();
+    }
+
+    function exportCSV() {
+      const headers = ['No','Tgl Terima','Jenis','Nomor Surat','Asal Surat','Isi Ringkas','Disposisi','Tgl Pelaksanaan','Waktu','Tempat','Scan'];
+      const rows = filteredData.map(d => [
+        d.no, d.tglTerima, d.jenis, d.nomorSurat, d.asal, d.isiRingkas, d.disposisi,
+        d.tglPelaksanaan, d.waktuPelaksanaan, d.tempat, d.scan
+      ]);
+      const csv = [headers, ...rows].map(r => r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `agenda-surat-masuk-${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function escapeHtml(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function truncate(s, n) {
+      if (!s) return '';
+      return s.length > n ? s.slice(0, n) + '…' : s;
+    }
+
+    // Keyboard
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Init
+    loadData();
+  </script>
+</body>
+</html>
