@@ -1,6 +1,6 @@
 {
   "name": "Agenda Sekretariat Dishut Jabar",
-  "short_name": "Agenda Dishut",
+  "short_name": "Agenda Sekretariat",
   "description": "Agenda Surat Masuk & Kegiatan Sekretariat Dinas Kehutanan Provinsi Jawa Barat",
   "start_url": "./index.html",
   "display": "standalone",

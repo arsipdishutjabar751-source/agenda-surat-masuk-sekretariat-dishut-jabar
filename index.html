@@ -9,18 +9,22 @@
   <meta name="description" content="Agenda Sekretariat Dinas Kehutanan Provinsi Jawa Barat" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png" />
-  <link rel="icon" type="image/png" href="icon-192.png" />
+  <link rel="icon" type="image/png" href="icon-64.png" />
   <title>Agenda Sekretariat Dinas Kehutanan Provinsi Jawa Barat</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     :root {
       --primary: #0d6e5f;
-      --primary-dark: #0a5549;
-      --bg: #f0f7f5;
-      --text: #1e293b;
-      --muted: #64748b;
-      --border: #e2e8f0;
+      --primary-dark: #085c4f;
+      --primary-soft: #e6f5f1;
+      --bg: #f3f7f5;
+      --card: #ffffff;
+      --text: #1a2e28;
+      --muted: #5c736c;
+      --border: #d8e5e0;
+      --shadow: 0 2px 12px rgba(13,110,95,0.08);
+      --radius: 12px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -29,208 +33,284 @@
       color: var(--text);
       min-height: 100vh;
       -webkit-tap-highlight-color: transparent;
+      line-height: 1.45;
     }
+
+    /* ===== HEADER ===== */
     .header {
-      background: linear-gradient(135deg, #0d6e5f, #0a5549);
+      background: linear-gradient(135deg, #0d6e5f 0%, #0a5549 100%);
       color: white;
-      padding: 0.7rem 1rem;
+      padding: 0.65rem 1.1rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 0.6rem;
+      gap: 0.65rem;
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.14);
     }
-    .header-left { display: flex; align-items: center; gap: 0.6rem; }
-    .logo {
-      width: 36px; height: 36px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem; flex-shrink: 0;
+    .header-left { display: flex; align-items: center; gap: 0.7rem; }
+    .logo-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      flex-shrink: 0;
     }
-    .header h1 { font-size: 0.95rem; font-weight: 700; line-height: 1.25; }
-    .header p { font-size: 0.68rem; opacity: 0.85; }
+    .logo-wrap img {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: white;
+      object-fit: cover;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .logo-sub {
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-top: 2px;
+      opacity: 0.95;
+      text-transform: uppercase;
+    }
+    .header-title h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .header-title p {
+      font-size: 0.7rem;
+      opacity: 0.85;
+      margin-top: 1px;
+    }
     .stats { display: flex; gap: 0.4rem; }
     .stat-box {
-      background: rgba(255,255,255,0.15);
-      border-radius: 8px;
-      padding: 0.3rem 0.65rem;
+      background: rgba(255,255,255,0.14);
+      border-radius: 10px;
+      padding: 0.35rem 0.7rem;
       text-align: center;
-      min-width: 56px;
+      min-width: 58px;
+      backdrop-filter: blur(6px);
     }
-    .stat-box .num { font-size: 1.05rem; font-weight: 700; display: block; }
+    .stat-box .num { font-size: 1.1rem; font-weight: 700; display: block; line-height: 1.2; }
     .stat-box .label { font-size: 0.58rem; opacity: 0.85; }
     .header-actions { display: flex; gap: 0.35rem; flex-wrap: wrap; }
     .btn {
-      border: none; border-radius: 8px;
-      padding: 0.42rem 0.8rem;
+      border: none; border-radius: 9px;
+      padding: 0.42rem 0.85rem;
       font-size: 0.78rem; font-weight: 600;
       cursor: pointer; display: inline-flex;
       align-items: center; gap: 0.3rem;
-      font-family: inherit; transition: all 0.15s;
+      font-family: inherit; transition: all 0.18s;
       white-space: nowrap;
     }
     .btn-white { background: white; color: var(--primary); }
-    .btn-white:hover { background: #f0fdf9; }
-    .btn-outline-w { background: transparent; color: white; border: 1.5px solid rgba(255,255,255,0.5); }
+    .btn-white:hover { background: #f0fdf9; transform: translateY(-1px); }
+    .btn-outline-w {
+      background: transparent; color: white;
+      border: 1.5px solid rgba(255,255,255,0.45);
+    }
     .btn-outline-w:hover { background: rgba(255,255,255,0.12); }
-    .btn-green { background: #0d6e5f; color: white; }
-    .btn-green:hover { background: #0a5549; }
+    .btn-green { background: var(--primary); color: white; }
+    .btn-green:hover { background: var(--primary-dark); }
     .btn-teal { background: #0d9488; color: white; }
     .btn-teal:hover { background: #0f766e; }
-    .btn-gray { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; }
-    .btn-gray:hover { background: #e2e8f0; }
+    .btn-gray {
+      background: #f1f5f4; color: #334155;
+      border: 1px solid var(--border);
+    }
+    .btn-gray:hover { background: #e5ebe9; }
     .btn-install { background: #fbbf24; color: #78350f; font-weight: 700; }
     .btn-install:hover { background: #f59e0b; }
 
+    /* ===== LIVE BANNER ===== */
     .live-banner {
-      background: linear-gradient(90deg, #064e3b 0%, #0d6e5f 40%, #115e59 100%);
+      background: linear-gradient(105deg, #064e3b 0%, #0d6e5f 45%, #115e59 100%);
       color: white;
-      padding: 0.55rem 1rem;
+      padding: 0.6rem 1rem 0.7rem;
       position: relative;
       overflow: hidden;
-      border-bottom: 2px solid rgba(255,255,255,0.1);
     }
     .live-top {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.4rem;
+      margin-bottom: 0.4rem; flex-wrap: wrap; gap: 0.4rem;
     }
-    .live-badges { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+    .live-badges { display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center; }
     .live-badge {
-      display: inline-flex; align-items: center; gap: 0.3rem;
+      display: inline-flex; align-items: center; gap: 0.28rem;
       background: rgba(255,255,255,0.12);
       border-radius: 20px;
-      padding: 0.2rem 0.65rem;
-      font-size: 0.72rem; font-weight: 600;
+      padding: 0.22rem 0.65rem;
+      font-size: 0.7rem; font-weight: 600;
     }
     .live-dot {
-      width: 8px; height: 8px; border-radius: 50%;
+      width: 7px; height: 7px; border-radius: 50%;
       background: #4ade80;
-      animation: pulse 1.5s infinite;
+      animation: pulse 1.4s infinite;
     }
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.85); }
+      50% { opacity: 0.45; transform: scale(0.8); }
     }
-    .live-time { font-size: 0.75rem; opacity: 0.85; font-weight: 500; }
+    .live-time { font-size: 0.72rem; opacity: 0.88; font-weight: 500; }
     .live-carousel {
-      display: flex; align-items: center; gap: 0.5rem;
-      min-height: 48px;
+      display: flex; align-items: center; gap: 0.45rem;
+      min-height: 56px;
     }
     .live-nav {
-      background: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.14);
       border: none; color: white;
-      width: 28px; height: 28px; border-radius: 50%;
-      cursor: pointer; font-size: 0.9rem;
+      width: 30px; height: 30px; border-radius: 50%;
+      cursor: pointer; font-size: 1rem;
       display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
+      flex-shrink: 0; transition: background 0.15s;
     }
-    .live-nav:hover { background: rgba(255,255,255,0.25); }
-    .live-content { flex: 1; overflow: hidden; min-width: 0; }
-    .live-label {
-      font-size: 0.65rem; font-weight: 700;
-      letter-spacing: 0.04em; opacity: 0.8;
-      text-transform: uppercase; margin-bottom: 0.15rem;
+    .live-nav:hover { background: rgba(255,255,255,0.28); }
+    .live-content {
+      flex: 1; overflow: hidden; min-width: 0;
+      position: relative; min-height: 52px;
     }
+    .live-slide {
+      position: absolute; inset: 0;
+      opacity: 0;
+      transition: opacity 0.45s ease;
+      pointer-events: none;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .live-slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      position: relative;
+    }
+    .live-status {
+      display: inline-block;
+      font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.12rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.2rem;
+      width: fit-content;
+    }
+    .status-berlangsung { background: #dc2626; color: white; }
+    .status-hariini { background: #f59e0b; color: #1c1917; }
+    .status-mendatang { background: #3b82f6; color: white; }
     .live-title {
-      font-size: 0.88rem; font-weight: 700;
+      font-size: 0.9rem; font-weight: 700;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .live-meta {
-      font-size: 0.72rem; opacity: 0.85;
-      display: flex; flex-wrap: wrap; gap: 0.5rem;
-      margin-top: 0.15rem;
+      font-size: 0.72rem; opacity: 0.9;
+      display: flex; flex-wrap: wrap; gap: 0.55rem;
+      margin-top: 0.18rem;
     }
     .live-meta span { display: inline-flex; align-items: center; gap: 0.2rem; }
     .live-dots {
-      display: flex; justify-content: center; gap: 0.3rem;
+      display: flex; justify-content: center; gap: 0.28rem;
       margin-top: 0.4rem;
     }
     .live-dot-nav {
       width: 6px; height: 6px; border-radius: 50%;
       background: rgba(255,255,255,0.3);
-      cursor: pointer; transition: all 0.2s;
+      cursor: pointer; transition: all 0.25s;
     }
-    .live-dot-nav.active { background: white; width: 16px; border-radius: 3px; }
-    .live-empty { font-size: 0.85rem; opacity: 0.7; padding: 0.3rem 0; }
+    .live-dot-nav.active {
+      background: white; width: 18px; border-radius: 3px;
+    }
+    .live-empty { font-size: 0.85rem; opacity: 0.7; padding: 0.4rem 0; }
 
+    /* ===== TABS ===== */
     .tabs {
       display: flex; gap: 0.35rem;
       padding: 0.55rem 1rem;
-      background: white;
+      background: var(--card);
       border-bottom: 1px solid var(--border);
       overflow-x: auto;
     }
     .tab {
-      padding: 0.38rem 0.8rem;
-      border-radius: 8px;
+      padding: 0.4rem 0.9rem;
+      border-radius: 9px;
       font-size: 0.78rem; font-weight: 600;
       cursor: pointer; border: none;
-      background: #f1f5f9; color: var(--muted);
+      background: #eef4f2; color: var(--muted);
       white-space: nowrap;
+      transition: all 0.15s;
     }
+    .tab:hover:not(.active) { background: #e0ebe7; }
     .tab.active { background: var(--primary); color: white; }
 
-    .filters {
-      display: flex; gap: 0.4rem;
-      padding: 0.6rem 1rem;
-      flex-wrap: wrap; align-items: center;
-      background: white;
+    /* ===== FILTERS ===== */
+    .filters, .agenda-controls {
+      display: flex; gap: 0.45rem;
+      padding: 0.7rem 1rem;
+      flex-wrap: wrap; align-items: flex-end;
+      background: var(--card);
       border-bottom: 1px solid var(--border);
     }
-    .search-box { flex: 1; min-width: 150px; position: relative; }
+    .ctrl-group { display: flex; flex-direction: column; }
+    .ctrl-group label, .agenda-controls label {
+      display: block; font-size: 0.65rem; font-weight: 600;
+      color: var(--muted); margin-bottom: 0.2rem;
+      text-transform: uppercase; letter-spacing: 0.03em;
+    }
+    .search-box { flex: 1; min-width: 160px; position: relative; }
     .search-box input {
       width: 100%;
-      padding: 0.45rem 0.8rem 0.45rem 2rem;
+      padding: 0.48rem 0.85rem 0.48rem 2.1rem;
       border: 1.5px solid var(--border);
-      border-radius: 8px;
+      border-radius: 9px;
       font-size: 0.82rem; font-family: inherit;
-      outline: none;
+      outline: none; background: #fafcfb;
+      transition: border 0.15s;
     }
-    .search-box input:focus { border-color: var(--primary); }
+    .search-box input:focus { border-color: var(--primary); background: white; }
     .search-box::before {
       content: "🔍";
-      position: absolute; left: 0.6rem; top: 50%;
+      position: absolute; left: 0.65rem; top: 50%;
       transform: translateY(-50%); font-size: 0.8rem;
     }
     select {
-      padding: 0.45rem 0.7rem;
+      padding: 0.48rem 0.75rem;
       border: 1.5px solid var(--border);
-      border-radius: 8px;
+      border-radius: 9px;
       font-size: 0.78rem; font-family: inherit;
-      background: white; cursor: pointer; outline: none;
+      background: #fafcfb; cursor: pointer; outline: none;
       max-width: 100%;
+      transition: border 0.15s;
+    }
+    select:focus { border-color: var(--primary); background: white; }
+    .agenda-btns { display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: flex-end; }
+    .agenda-count {
+      font-size: 0.8rem; color: var(--muted);
+      padding: 0.35rem 1rem 0;
+      font-weight: 500;
     }
 
-    .table-wrap { overflow-x: auto; padding: 0.6rem 1rem 1.5rem; }
+    /* ===== TABLES ===== */
+    .table-wrap { overflow-x: auto; padding: 0.7rem 1rem 1.5rem; }
     table {
       width: 100%; border-collapse: collapse;
-      background: white; border-radius: 10px;
-      overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      background: var(--card); border-radius: var(--radius);
+      overflow: hidden; box-shadow: var(--shadow);
       font-size: 0.8rem;
     }
-    thead { background: #f8fafc; }
+    thead { background: #f5faf8; }
     th {
-      padding: 0.55rem 0.65rem;
+      padding: 0.6rem 0.7rem;
       text-align: left; font-weight: 600;
       color: var(--muted); font-size: 0.68rem;
-      text-transform: uppercase;
+      text-transform: uppercase; letter-spacing: 0.03em;
       border-bottom: 2px solid var(--border);
       white-space: nowrap; cursor: pointer;
     }
+    th:hover { color: var(--primary); }
     td {
-      padding: 0.5rem 0.65rem;
-      border-bottom: 1px solid #f1f5f9;
+      padding: 0.55rem 0.7rem;
+      border-bottom: 1px solid #eef4f2;
       vertical-align: top;
     }
-    tr:hover td { background: #f8fafc; }
+    tr:hover td { background: #f7fbf9; }
     .badge {
       display: inline-block;
-      padding: 0.12rem 0.5rem;
+      padding: 0.14rem 0.5rem;
       border-radius: 20px;
       font-size: 0.68rem; font-weight: 600;
     }
@@ -243,10 +323,11 @@
     .badge-edaran { background: #ccfbf1; color: #0f766e; }
     .badge-default { background: #f1f5f9; color: #475569; }
     .scan-link { color: var(--primary); font-weight: 600; text-decoration: none; font-size: 0.75rem; }
+    .scan-link:hover { text-decoration: underline; }
 
     .pagination {
       display: flex; justify-content: space-between;
-      align-items: center; padding: 0.6rem 1rem;
+      align-items: center; padding: 0.6rem 1rem 1.2rem;
       flex-wrap: wrap; gap: 0.4rem;
     }
     .page-info { font-size: 0.78rem; color: var(--muted); }
@@ -257,14 +338,16 @@
       border-radius: 8px; background: white;
       cursor: pointer; font-weight: 600; font-size: 0.78rem;
       display: flex; align-items: center; justify-content: center;
+      transition: all 0.12s;
     }
+    .page-btn:hover:not(:disabled):not(.active) { border-color: var(--primary); color: var(--primary); }
     .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
     .loading { text-align: center; padding: 3rem 1rem; color: var(--muted); }
     .spinner {
       width: 34px; height: 34px;
-      border: 3px solid #e2e8f0;
+      border: 3px solid #d8e5e0;
       border-top-color: var(--primary);
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
@@ -272,9 +355,61 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ===== AGENDA CAPTURE ===== */
+    #agendaPanel { display: none; }
+    #agendaCapture {
+      margin: 0.65rem 1rem 1.5rem;
+      background: white;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .agenda-banner {
+      background: linear-gradient(90deg, #0d6e5f 0%, #14b8a6 55%, #0d9488 100%);
+      color: white;
+      padding: 0.85rem 1.1rem;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .agenda-banner-left { display: flex; align-items: center; gap: 0.7rem; min-width: 0; }
+    .agenda-logo-img {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: white;
+      object-fit: cover;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+    .agenda-banner h2 {
+      font-size: 0.95rem; font-weight: 700; line-height: 1.3;
+    }
+    .agenda-banner .megaphone { font-size: 1.35rem; flex-shrink: 0; }
+    .agenda-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    .agenda-table thead th {
+      background: #c2410c;
+      color: white;
+      padding: 0.55rem 0.65rem;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border: none; cursor: default;
+    }
+    .agenda-table tbody td {
+      padding: 0.55rem 0.65rem;
+      border-bottom: 1px solid #e8eeeb;
+      vertical-align: top; line-height: 1.4;
+    }
+    .agenda-table tbody tr:nth-child(even) { background: #f8fbfa; }
+    .agenda-table tbody tr:hover { background: #eef8f4; }
+    .disp-red { color: #dc2626; font-weight: 700; }
+    .link-surat { color: #0d9488; font-weight: 600; text-decoration: none; font-size: 0.72rem; }
+    .link-surat:hover { text-decoration: underline; }
+    .agenda-empty { text-align: center; padding: 2.2rem; color: var(--muted); }
+
+    /* ===== MODALS ===== */
     .modal-overlay {
       position: fixed; inset: 0;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.48);
       z-index: 300; display: none;
       align-items: center; justify-content: center;
       padding: 0.75rem;
@@ -285,94 +420,36 @@
       background: white; border-radius: 14px;
       max-width: 640px; width: 100%;
       max-height: 92vh; overflow-y: auto;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.22);
     }
     .modal-header {
-      padding: 0.9rem 1.1rem;
+      padding: 0.9rem 1.15rem;
       border-bottom: 1px solid var(--border);
       display: flex; justify-content: space-between; align-items: center;
       position: sticky; top: 0; background: white; z-index: 1;
     }
     .modal-header h2 { font-size: 1rem; }
     .modal-close {
-      background: none; border: none;
-      font-size: 1.4rem; cursor: pointer; color: var(--muted);
-      width: 32px; height: 32px;
+      background: #f1f5f4; border: none;
+      font-size: 1.2rem; cursor: pointer; color: var(--muted);
+      width: 32px; height: 32px; border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
     }
-    .modal-body { padding: 1rem 1.1rem; }
+    .modal-close:hover { background: #e5ebe9; }
+    .modal-body { padding: 1rem 1.15rem; }
     .modal-footer {
-      padding: 0.75rem 1.1rem;
+      padding: 0.75rem 1.15rem;
       border-top: 1px solid var(--border);
       display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: flex-end;
       position: sticky; bottom: 0; background: white;
     }
     .detail-row {
       display: grid; grid-template-columns: 130px 1fr;
-      gap: 0.3rem; padding: 0.35rem 0;
-      border-bottom: 1px solid #f1f5f9; font-size: 0.85rem;
+      gap: 0.3rem; padding: 0.4rem 0;
+      border-bottom: 1px solid #eef4f2; font-size: 0.85rem;
     }
     .detail-label { color: var(--muted); font-weight: 500; }
     .detail-value { font-weight: 500; word-break: break-word; }
-
-    #agendaPanel { display: none; }
-    .agenda-controls {
-      background: white;
-      padding: 0.85rem 1rem;
-      border-bottom: 1px solid var(--border);
-      display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: flex-end;
-    }
-    .agenda-controls label {
-      display: block; font-size: 0.68rem; font-weight: 600;
-      color: var(--muted); margin-bottom: 0.2rem; text-transform: uppercase;
-    }
-    .ctrl-group { display: flex; flex-direction: column; }
-    .agenda-btns { display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: flex-end; }
-    .agenda-count {
-      font-size: 0.82rem; color: var(--muted);
-      padding: 0.4rem 1rem 0;
-    }
-    #agendaCapture {
-      margin: 0.6rem 1rem 1.5rem;
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    }
-    .agenda-banner {
-      background: linear-gradient(90deg, #0d6e5f 0%, #14b8a6 50%, #0d9488 100%);
-      color: white;
-      padding: 0.8rem 1rem;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .agenda-banner-left { display: flex; align-items: center; gap: 0.65rem; }
-    .agenda-logo {
-      width: 40px; height: 40px;
-      background: white; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.58rem; font-weight: 800; color: #0d6e5f;
-      text-align: center; line-height: 1.1; flex-shrink: 0;
-    }
-    .agenda-banner h2 { font-size: 0.92rem; font-weight: 700; line-height: 1.3; }
-    .agenda-banner .megaphone { font-size: 1.4rem; flex-shrink: 0; }
-    .agenda-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
-    .agenda-table thead th {
-      background: #d97706;
-      color: white;
-      padding: 0.5rem 0.6rem;
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      border: none; cursor: default;
-    }
-    .agenda-table tbody td {
-      padding: 0.5rem 0.6rem;
-      border-bottom: 1px solid #e5e7eb;
-      vertical-align: top; line-height: 1.35;
-    }
-    .agenda-table tbody tr:nth-child(even) { background: #f9fafb; }
-    .disp-red { color: #dc2626; font-weight: 700; }
-    .link-surat { color: #0d9488; font-weight: 600; text-decoration: none; font-size: 0.72rem; }
-    .agenda-empty { text-align: center; padding: 2rem; color: var(--muted); }
     .preview-wrap {
       max-height: 55vh; overflow: auto;
       border: 1px solid var(--border);
@@ -381,20 +458,24 @@
     }
     .preview-wrap #agendaCapturePreview { margin: 0; box-shadow: none; border-radius: 0; }
 
+    /* ===== RESPONSIVE ===== */
     @media (max-width: 640px) {
       .header { padding: 0.55rem 0.75rem; }
-      .header h1 { font-size: 0.85rem; }
+      .header-title h1 { font-size: 0.88rem; }
+      .logo-wrap img { width: 36px; height: 36px; }
+      .logo-sub { font-size: 0.5rem; }
       .stats { order: 3; width: 100%; justify-content: center; }
-      .stat-box { min-width: 50px; padding: 0.25rem 0.5rem; }
-      .stat-box .num { font-size: 0.95rem; }
-      .filters, .agenda-controls { padding: 0.5rem 0.75rem; }
+      .stat-box { min-width: 52px; padding: 0.28rem 0.5rem; }
+      .stat-box .num { font-size: 0.98rem; }
+      .filters, .agenda-controls { padding: 0.55rem 0.75rem; }
       .table-wrap { padding: 0.5rem 0.5rem 1rem; }
       #agendaCapture { margin: 0.5rem 0.5rem 1rem; }
       .agenda-banner h2 { font-size: 0.8rem; }
+      .agenda-logo-img { width: 36px; height: 36px; }
       .agenda-table { font-size: 0.72rem; }
       .agenda-table thead th, .agenda-table tbody td { padding: 0.4rem 0.4rem; }
-      .detail-row { grid-template-columns: 1fr; gap: 0.1rem; }
-      .live-title { font-size: 0.8rem; }
+      .detail-row { grid-template-columns: 1fr; gap: 0.08rem; }
+      .live-title { font-size: 0.82rem; }
       .btn { padding: 0.38rem 0.65rem; font-size: 0.72rem; }
     }
     @media print {
@@ -408,8 +489,11 @@
 <body>
   <header class="header">
     <div class="header-left">
-      <div class="logo">📋</div>
-      <div>
+      <div class="logo-wrap">
+        <img src="logo-dishut.png" alt="Dishut Jabar" />
+        <span class="logo-sub">Sekretariat</span>
+      </div>
+      <div class="header-title">
         <h1>Agenda Sekretariat</h1>
         <p>Dinas Kehutanan Provinsi Jawa Barat</p>
       </div>
@@ -436,12 +520,12 @@
       </div>
       <span class="live-time" id="liveClock">--:-- WIB</span>
     </div>
-    <div class="live-carousel" id="liveCarousel">
-      <button class="live-nav" onclick="livePrev()">‹</button>
+    <div class="live-carousel">
+      <button class="live-nav" onclick="livePrev()" aria-label="Sebelumnya">‹</button>
       <div class="live-content" id="liveContent">
         <div class="live-empty">Memuat kegiatan...</div>
       </div>
-      <button class="live-nav" onclick="liveNext()">›</button>
+      <button class="live-nav" onclick="liveNext()" aria-label="Berikutnya">›</button>
     </div>
     <div class="live-dots" id="liveDots"></div>
   </div>
@@ -484,7 +568,7 @@
     <div id="agendaCapture">
       <div class="agenda-banner">
         <div class="agenda-banner-left">
-          <div class="agenda-logo">DISHUT<br>JABAR</div>
+          <img class="agenda-logo-img" src="logo-dishut.png" alt="Dishut Jabar" />
           <h2>Agenda Sekretariat Dinas Kehutanan Provinsi Jawa Barat</h2>
         </div>
         <div class="megaphone">📢</div>
@@ -572,7 +656,7 @@
         <div class="preview-wrap" id="previewWrap"></div>
         <div id="previewWAText" style="display:none;">
           <label style="font-size:0.78rem;font-weight:600;color:var(--muted);">Teks yang akan dibagikan:</label>
-          <textarea id="waTextArea" style="width:100%;height:180px;margin-top:0.4rem;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.82rem;font-family:inherit;resize:vertical;"></textarea>
+          <textarea id="waTextArea" style="width:100%;height:180px;margin-top:0.4rem;padding:0.65rem;border:1.5px solid var(--border);border-radius:9px;font-size:0.82rem;font-family:inherit;resize:vertical;"></textarea>
         </div>
       </div>
       <div class="modal-footer">
@@ -585,7 +669,7 @@
   <script>
     const SHEET_ID = '1WSltmAZUBjhtEMZeYOjGm172lC_jSxrRNaLprHgeVkM';
     const GID = '880071478';
-    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&tq=select%20*&gid=${GID}`;
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json&tq=select%20*&gid=' + GID;
     const COL = {
       timestamp:0, nomorUrut:1, tglTerima:2, jenis:3, nomorSurat:4,
       asal:5, tglSurat:6, hariPelaksanaan:7, tglPelaksanaan:8,
@@ -600,24 +684,24 @@
     let previewMode = null;
     let deferredPrompt = null;
 
-    window.addEventListener('beforeinstallprompt', (e) => {
+    window.addEventListener('beforeinstallprompt', function(e) {
       e.preventDefault();
       deferredPrompt = e;
       document.getElementById('btnInstall').style.display = 'inline-flex';
     });
     async function installPWA() {
       if (!deferredPrompt) {
-        alert('Untuk memasang di HP:\\n\\n• Chrome/Edge: Menu (⋮) → "Install app" atau "Add to Home screen"\\n• Safari iOS: Tombol Share → "Add to Home Screen"');
+        alert('Untuk memasang di HP:\n\n• Chrome/Edge: Menu (⋮) → "Install app" atau "Add to Home screen"\n• Safari iOS: Tombol Share → "Add to Home Screen"');
         return;
       }
       deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') document.getElementById('btnInstall').style.display = 'none';
+      var result = await deferredPrompt.userChoice;
+      if (result.outcome === 'accepted') document.getElementById('btnInstall').style.display = 'none';
       deferredPrompt = null;
     }
 
     function updateClock() {
-      const now = new Date();
+      var now = new Date();
       document.getElementById('liveClock').textContent =
         String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ' WIB';
     }
@@ -629,23 +713,26 @@
       document.getElementById('tableSection').style.display = 'none';
       document.getElementById('pagination').style.display = 'none';
       try {
-        const res = await fetch(SHEET_URL + '&_t=' + Date.now());
-        const text = await res.text();
-        const jsonStr = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?/)[1];
-        const data = JSON.parse(jsonStr);
-        const rows = data.table.rows || [];
-        allData = rows.map((r, idx) => {
-          const c = r.c || [];
-          const get = (i) => {
+        var res = await fetch(SHEET_URL + '&_t=' + Date.now());
+        var text = await res.text();
+        var m = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?/);
+        if (!m) throw new Error('Format data Google Sheet tidak dikenali');
+        var data = JSON.parse(m[1]);
+        var rows = data.table.rows || [];
+        allData = rows.map(function(r, idx) {
+          var c = r.c || [];
+          function get(i) {
             if (!c[i]) return '';
-            return (c[i].f !== undefined && c[i].f !== null) ? String(c[i].f) : (c[i].v != null ? String(c[i].v) : '');
-          };
-          const dispSek = get(COL.disposisiSekdishut);
-          const catSek = get(COL.catatanSekdishut);
-          const dispKad = get(COL.disposisiKadishut);
-          const catKad = get(COL.catatanKadishut);
-          const disposisi = (dispSek && dispSek !== '-') ? dispSek : ((dispKad && dispKad !== '-') ? dispKad : '-');
-          const catatan = (catSek && catSek !== '-') ? catSek : ((catKad && catKad !== '-') ? catKad : '');
+            if (c[i].f !== undefined && c[i].f !== null) return String(c[i].f);
+            if (c[i].v != null) return String(c[i].v);
+            return '';
+          }
+          var dispSek = get(COL.disposisiSekdishut);
+          var catSek = get(COL.catatanSekdishut);
+          var dispKad = get(COL.disposisiKadishut);
+          var catKad = get(COL.catatanKadishut);
+          var disposisi = (dispSek && dispSek !== '-') ? dispSek : ((dispKad && dispKad !== '-') ? dispKad : '-');
+          var catatan = (catSek && catSek !== '-') ? catSek : ((catKad && catKad !== '-') ? catKad : '');
           return {
             no: parseFloat(get(COL.nomorUrut)) || (idx + 1),
             tglTerima: get(COL.tglTerima),
@@ -659,12 +746,13 @@
             tempat: get(COL.tempat),
             ketTempat: get(COL.ketTempat),
             isiRingkas: get(COL.isiRingkas),
-            disposisi, catatan,
+            disposisi: disposisi,
+            catatan: catatan,
             scan: get(COL.scan),
             timestamp: get(COL.timestamp)
           };
-        }).filter(d => d.nomorSurat || d.isiRingkas);
-        allData.sort((a, b) => b.no - a.no);
+        }).filter(function(d) { return d.nomorSurat || d.isiRingkas; });
+        allData.sort(function(a, b) { return b.no - a.no; });
         buildFilterOptions();
         applyFilters();
         updateStats();
@@ -681,85 +769,108 @@
 
     function parseTglPelaksanaan(str) {
       if (!str || str === '-') return null;
-      const bulanMap = {
+      var bulanMap = {
         'januari':0,'februari':1,'maret':2,'april':3,'mei':4,'juni':5,
         'juli':6,'agustus':7,'september':8,'oktober':9,'november':10,'desember':11
       };
-      const m = str.match(/(\d{1,2})\s*(?:–|-|s\.?d\.?)?\s*(?:\d{1,2}\s+)?([A-Za-z]+)\s+(\d{4})/i);
+      var m = str.match(/(\d{1,2})\s*(?:–|-|s\.?d\.?)?\s*(?:\d{1,2}\s+)?([A-Za-z]+)\s+(\d{4})/i);
       if (m) {
-        const day = parseInt(m[1],10);
-        const mon = bulanMap[m[2].toLowerCase()];
-        const year = parseInt(m[3],10);
+        var day = parseInt(m[1], 10);
+        var mon = bulanMap[m[2].toLowerCase()];
+        var year = parseInt(m[3], 10);
         if (mon !== undefined) return new Date(year, mon, day);
       }
-      const m2 = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+      var m2 = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
       if (m2) return new Date(+m2[3], +m2[2]-1, +m2[1]);
       return null;
     }
     function isToday(dt) {
       if (!dt) return false;
-      const t = new Date();
+      var t = new Date();
       return dt.getDate()===t.getDate() && dt.getMonth()===t.getMonth() && dt.getFullYear()===t.getFullYear();
     }
 
     function buildLiveItems() {
-      const today = new Date(); today.setHours(0,0,0,0);
-      const hariIni = [], mendatang = [];
-      allData.forEach(d => {
-        if (!['Undangan','Permohonan'].includes(d.jenis)) return;
-        const hasPel = (d.tglPelaksanaan && d.tglPelaksanaan !== '-') ||
-                       (d.hariPelaksanaan && d.hariPelaksanaan !== '-');
+      var today = new Date(); today.setHours(0,0,0,0);
+      var hariIni = [], mendatang = [];
+      allData.forEach(function(d) {
+        if (['Undangan','Permohonan'].indexOf(d.jenis) === -1) return;
+        var hasPel = (d.tglPelaksanaan && d.tglPelaksanaan !== '-') ||
+                     (d.hariPelaksanaan && d.hariPelaksanaan !== '-');
         if (!hasPel) return;
-        const dt = parseTglPelaksanaan(d.tglPelaksanaan);
-        const item = Object.assign({}, d, {_date: dt});
+        var dt = parseTglPelaksanaan(d.tglPelaksanaan);
+        var item = Object.assign({}, d, {_date: dt});
         if (dt && isToday(dt)) hariIni.push(item);
         else if (dt && dt > today) mendatang.push(item);
         else if (!dt && hasPel) mendatang.push(item);
       });
-      const byDate = (a,b) => (a._date||new Date(9999,0,1)) - (b._date||new Date(9999,0,1));
+      var byDate = function(a,b) { return (a._date||new Date(9999,0,1)) - (b._date||new Date(9999,0,1)); };
       hariIni.sort(byDate);
       mendatang.sort(byDate);
-      const berlangsung = hariIni.slice(0, Math.min(3, hariIni.length));
+      var berlangsung = hariIni.slice(0, Math.min(3, hariIni.length));
       document.getElementById('badgeBerlangsung').textContent = berlangsung.length + ' berlangsung';
       document.getElementById('badgeHariIni').textContent = hariIni.length + ' hari ini';
       document.getElementById('badgeMendatang').textContent = mendatang.length + ' mendatang';
-      liveItems = berlangsung.map(d => Object.assign({}, d, {status:'BERLANGSUNG'}))
-        .concat(hariIni.filter(d => !berlangsung.includes(d)).map(d => Object.assign({}, d, {status:'HARI INI'})))
-        .concat(mendatang.slice(0,12).map(d => Object.assign({}, d, {status:'MENDATANG'})));
+      liveItems = [];
+      berlangsung.forEach(function(d) { liveItems.push(Object.assign({}, d, {status:'BERLANGSUNG', statusClass:'status-berlangsung'})); });
+      hariIni.forEach(function(d) {
+        if (berlangsung.indexOf(d) === -1)
+          liveItems.push(Object.assign({}, d, {status:'HARI INI', statusClass:'status-hariini'}));
+      });
+      mendatang.slice(0,12).forEach(function(d) {
+        liveItems.push(Object.assign({}, d, {status:'MENDATANG', statusClass:'status-mendatang'}));
+      });
       liveIndex = 0;
       renderLiveSlide();
       startLiveAuto();
     }
 
     function renderLiveSlide() {
-      const el = document.getElementById('liveContent');
-      const dots = document.getElementById('liveDots');
+      var el = document.getElementById('liveContent');
+      var dots = document.getElementById('liveDots');
       if (liveItems.length === 0) {
         el.innerHTML = '<div class="live-empty">Tidak ada kegiatan terjadwal dalam waktu dekat.</div>';
         dots.innerHTML = '';
         return;
       }
-      const d = liveItems[liveIndex];
-      const waktu = [
+      var d = liveItems[liveIndex];
+      var waktu = [
         d.hariPelaksanaan && d.hariPelaksanaan !== '-' ? d.hariPelaksanaan : '',
         d.tglPelaksanaan && d.tglPelaksanaan !== '-' ? d.tglPelaksanaan : '',
         d.waktuPelaksanaan && d.waktuPelaksanaan !== '-' ? d.waktuPelaksanaan : ''
       ].filter(Boolean).join(' · ');
-      let tempat = d.tempat || '';
+      var tempat = d.tempat || '';
       if (d.ketTempat && d.ketTempat !== '-') tempat += (tempat ? ' · ' : '') + d.ketTempat;
-      el.innerHTML =
-        '<div class="live-label">' + d.status + '</div>' +
+
+      // Fade: create new slide, fade out old
+      var old = el.querySelector('.live-slide.active');
+      var slide = document.createElement('div');
+      slide.className = 'live-slide';
+      slide.innerHTML =
+        '<span class="live-status ' + d.statusClass + '">' + d.status + '</span>' +
         '<div class="live-title">' + esc(d.isiRingkas || d.asal) + '</div>' +
         '<div class="live-meta">' +
           (waktu ? '<span>🕐 ' + esc(waktu) + '</span>' : '') +
-          (tempat ? '<span>📍 ' + esc(trunc(tempat,50)) + '</span>' : '') +
+          (tempat ? '<span>📍 ' + esc(trunc(tempat,48)) + '</span>' : '') +
           (d.disposisi && d.disposisi !== '-' ? '<span>📌 ' + esc(d.disposisi) + '</span>' : '') +
           (d.scan ? '<span><a href="' + esc(d.scan) + '" target="_blank" rel="noopener" style="color:#6ee7b7;text-decoration:underline;">Surat</a></span>' : '') +
         '</div>';
-      const maxDots = Math.min(liveItems.length, 10);
-      let dotsHtml = '';
-      for (let i = 0; i < maxDots; i++) {
-        dotsHtml += '<span class="live-dot-nav ' + (i === liveIndex % maxDots ? 'active' : '') + '" onclick="liveGo(' + i + ')"></span>';
+      el.appendChild(slide);
+      // Force reflow then activate
+      void slide.offsetWidth;
+      slide.classList.add('active');
+      if (old) {
+        old.classList.remove('active');
+        setTimeout(function() { if (old.parentNode) old.parentNode.removeChild(old); }, 450);
+      }
+      // Clean empty placeholder
+      var empty = el.querySelector('.live-empty');
+      if (empty) empty.remove();
+
+      var maxDots = Math.min(liveItems.length, 10);
+      var dotsHtml = '';
+      for (var i = 0; i < maxDots; i++) {
+        dotsHtml += '<span class="live-dot-nav' + (i === liveIndex % maxDots ? ' active' : '') + '" onclick="liveGo(' + i + ')"></span>';
       }
       dots.innerHTML = dotsHtml;
     }
@@ -778,56 +889,60 @@
     function liveGo(i) { liveIndex = i; renderLiveSlide(); startLiveAuto(); }
     function startLiveAuto() {
       clearInterval(liveTimer);
-      liveTimer = setInterval(liveNext, 6000);
+      liveTimer = setInterval(liveNext, 6500);
     }
 
     function buildFilterOptions() {
-      const jenisSet = new Set(), dispSet = new Set(), bulanSet = new Set();
-      allData.forEach(d => {
-        if (d.jenis) jenisSet.add(d.jenis);
+      var jenisSet = {}, dispSet = {}, bulanSet = {};
+      allData.forEach(function(d) {
+        if (d.jenis) jenisSet[d.jenis] = true;
         if (d.disposisi && d.disposisi !== '-') {
-          d.disposisi.split(/[,;]/).forEach(x => { const t = x.trim(); if (t) dispSet.add(t); });
+          d.disposisi.split(/[,;]/).forEach(function(x) {
+            var t = x.trim(); if (t) dispSet[t] = true;
+          });
         }
-        const m = d.tglTerima.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+        var m = d.tglTerima.match(/(\d{2})\/(\d{2})\/(\d{4})/);
         if (m) {
-          const bn = ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-          bulanSet.add(m[3] + '-' + m[2] + '|' + bn[+m[2]] + ' ' + m[3]);
+          var bn = ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+          bulanSet[m[3] + '-' + m[2] + '|' + bn[+m[2]] + ' ' + m[3]] = true;
         }
       });
       function fill(sel, set, label) {
         sel.innerHTML = '<option value="">' + label + '</option>';
-        Array.from(set).sort().forEach(v => { sel.innerHTML += '<option value="' + esc(v) + '">' + esc(v) + '</option>'; });
+        Object.keys(set).sort().forEach(function(v) {
+          sel.innerHTML += '<option value="' + esc(v) + '">' + esc(v) + '</option>';
+        });
       }
       fill(document.getElementById('filterJenis'), jenisSet, 'Semua Jenis');
       fill(document.getElementById('filterDisposisi'), dispSet, 'Semua Disposisi');
-      const bs = document.getElementById('filterBulan');
+      var bs = document.getElementById('filterBulan');
       bs.innerHTML = '<option value="">Semua Bulan</option>';
-      Array.from(bulanSet).sort().reverse().forEach(b => {
-        const parts = b.split('|');
+      Object.keys(bulanSet).sort().reverse().forEach(function(b) {
+        var parts = b.split('|');
         bs.innerHTML += '<option value="' + parts[0] + '">' + parts[1] + '</option>';
       });
     }
 
     function applyFilters() {
-      const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
-      const jenis = document.getElementById('filterJenis').value;
-      const disp = document.getElementById('filterDisposisi').value;
-      const bulan = document.getElementById('filterBulan').value;
-      filteredData = allData.filter(d => {
+      var q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      var jenis = document.getElementById('filterJenis').value;
+      var disp = document.getElementById('filterDisposisi').value;
+      var bulan = document.getElementById('filterBulan').value;
+      filteredData = allData.filter(function(d) {
         if (jenis && d.jenis !== jenis) return false;
-        if (disp && !(d.disposisi||'').includes(disp)) return false;
+        if (disp && (d.disposisi||'').indexOf(disp) === -1) return false;
         if (bulan) {
-          const m = d.tglTerima.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+          var m = d.tglTerima.match(/(\d{2})\/(\d{2})\/(\d{4})/);
           if (!m || (m[3]+'-'+m[2]) !== bulan) return false;
         }
         if (q) {
-          const hay = (d.nomorSurat + ' ' + d.asal + ' ' + d.isiRingkas + ' ' + d.disposisi + ' ' + d.no).toLowerCase();
-          if (!hay.includes(q)) return false;
+          var hay = (d.nomorSurat + ' ' + d.asal + ' ' + d.isiRingkas + ' ' + d.disposisi + ' ' + d.no).toLowerCase();
+          if (hay.indexOf(q) === -1) return false;
         }
         return true;
       });
-      filteredData.sort((a,b) => {
-        let va = a[sortKey], vb = b[sortKey];
+      filteredData.sort(function(a,b) {
+        var va = a[sortKey], vb = b[sortKey];
         if (sortKey === 'no') { va = a.no; vb = b.no; }
         if (typeof va === 'string') va = va.toLowerCase();
         if (typeof vb === 'string') vb = vb.toLowerCase();
@@ -843,33 +958,33 @@
     function updateStats() {
       document.getElementById('statTotal').textContent = allData.length.toLocaleString('id-ID');
       document.getElementById('statFiltered').textContent = filteredData.length.toLocaleString('id-ID');
-      const t = new Date();
-      const cnt = allData.filter(d => {
-        const m = d.tglTerima.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+      var t = new Date();
+      var cnt = allData.filter(function(d) {
+        var m = d.tglTerima.match(/(\d{2})\/(\d{2})\/(\d{4})/);
         return m && +m[1]===t.getDate() && +m[2]===(t.getMonth()+1) && +m[3]===t.getFullYear();
       }).length;
       document.getElementById('statToday').textContent = cnt;
     }
 
     function renderTable() {
-      const tbody = document.getElementById('tableBody');
-      const start = (currentPage-1)*perPage;
-      const page = filteredData.slice(start, start+perPage);
+      var tbody = document.getElementById('tableBody');
+      var start = (currentPage-1)*perPage;
+      var page = filteredData.slice(start, start+perPage);
       if (!page.length) {
         tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted);">Tidak ada data.</td></tr>';
       } else {
-        tbody.innerHTML = page.map(d =>
-          '<tr onclick="showDetail(' + d.no + ')" style="cursor:pointer;">' +
-          '<td><strong>' + d.no + '</strong></td>' +
-          '<td>' + esc(d.tglTerima) + '</td>' +
-          '<td>' + badgeJenis(d.jenis) + '</td>' +
-          '<td style="font-family:monospace;font-size:0.75rem;">' + esc(d.nomorSurat) + '</td>' +
-          '<td>' + esc(trunc(d.asal,36)) + '</td>' +
-          '<td>' + esc(trunc(d.isiRingkas,50)) + '</td>' +
-          '<td style="font-size:0.75rem;color:var(--muted);">' + esc(trunc(d.disposisi,26)) + '</td>' +
-          '<td>' + (d.scan ? '<a class="scan-link" href="' + esc(d.scan) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Buka ↗</a>' : '–') + '</td>' +
-          '</tr>'
-        ).join('');
+        tbody.innerHTML = page.map(function(d) {
+          return '<tr onclick="showDetail(' + d.no + ')" style="cursor:pointer;">' +
+            '<td><strong>' + d.no + '</strong></td>' +
+            '<td>' + esc(d.tglTerima) + '</td>' +
+            '<td>' + badgeJenis(d.jenis) + '</td>' +
+            '<td style="font-family:monospace;font-size:0.75rem;">' + esc(d.nomorSurat) + '</td>' +
+            '<td>' + esc(trunc(d.asal,36)) + '</td>' +
+            '<td>' + esc(trunc(d.isiRingkas,50)) + '</td>' +
+            '<td style="font-size:0.75rem;color:var(--muted);">' + esc(trunc(d.disposisi,26)) + '</td>' +
+            '<td>' + (d.scan ? '<a class="scan-link" href="' + esc(d.scan) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Buka ↗</a>' : '–') + '</td>' +
+            '</tr>';
+        }).join('');
       }
       document.getElementById('loading').style.display = 'none';
       document.getElementById('tableSection').style.display = 'block';
@@ -878,21 +993,21 @@
     }
 
     function renderPagination() {
-      const total = Math.max(1, Math.ceil(filteredData.length/perPage));
-      const start = (currentPage-1)*perPage+1;
-      const end = Math.min(currentPage*perPage, filteredData.length);
+      var total = Math.max(1, Math.ceil(filteredData.length/perPage));
+      var start = (currentPage-1)*perPage+1;
+      var end = Math.min(currentPage*perPage, filteredData.length);
       document.getElementById('pageInfo').textContent =
         filteredData.length===0 ? '0 data' : 'Menampilkan ' + start + '–' + end + ' dari ' + filteredData.length.toLocaleString('id-ID');
-      let html = '<button class="page-btn" ' + (currentPage<=1?'disabled':'') + ' onclick="goPage(' + (currentPage-1) + ')">‹</button>';
-      getPages(currentPage,total).forEach(p => {
+      var html = '<button class="page-btn" ' + (currentPage<=1?'disabled':'') + ' onclick="goPage(' + (currentPage-1) + ')">‹</button>';
+      getPages(currentPage,total).forEach(function(p) {
         if (p==='...') html += '<span style="padding:0 0.2rem;color:var(--muted);">…</span>';
-        else html += '<button class="page-btn ' + (p===currentPage?'active':'') + '" onclick="goPage(' + p + ')">' + p + '</button>';
+        else html += '<button class="page-btn' + (p===currentPage?' active':'') + '" onclick="goPage(' + p + ')">' + p + '</button>';
       });
       html += '<button class="page-btn" ' + (currentPage>=total?'disabled':'') + ' onclick="goPage(' + (currentPage+1) + ')">›</button>';
       document.getElementById('pageBtns').innerHTML = html;
     }
     function getPages(c,t) {
-      if (t<=7) return Array.from({length:t},(_,i)=>i+1);
+      if (t<=7) { var a=[]; for(var i=1;i<=t;i++) a.push(i); return a; }
       if (c<=4) return [1,2,3,4,5,'...',t];
       if (c>=t-3) return [1,'...',t-4,t-3,t-2,t-1,t];
       return [1,'...',c-1,c,c+1,'...',t];
@@ -900,31 +1015,31 @@
     function goPage(p){ currentPage=p; renderTable(); window.scrollTo({top:0,behavior:'smooth'}); }
     function changePerPage(){ perPage=+document.getElementById('perPage').value; currentPage=1; renderTable(); }
 
-    document.querySelectorAll('th[data-sort]').forEach(th => {
-      th.addEventListener('click', () => {
-        const k = th.dataset.sort;
+    document.querySelectorAll('th[data-sort]').forEach(function(th) {
+      th.addEventListener('click', function() {
+        var k = th.dataset.sort;
         if (sortKey===k) sortAsc=!sortAsc; else { sortKey=k; sortAsc=true; }
         applyFilters();
       });
     });
 
     function renderAgenda() {
-      const rangeVal = document.getElementById('agendaRange').value;
-      const jenisVal = document.getElementById('agendaJenis').value;
-      const today = new Date(); today.setHours(0,0,0,0);
-      let maxDate = null;
+      var rangeVal = document.getElementById('agendaRange').value;
+      var jenisVal = document.getElementById('agendaJenis').value;
+      var today = new Date(); today.setHours(0,0,0,0);
+      var maxDate = null;
       if (rangeVal !== 'all') {
         maxDate = new Date(today);
         maxDate.setDate(maxDate.getDate() + parseInt(rangeVal,10));
       }
-      const jenisList = jenisVal === 'all' ? null : jenisVal.split(',');
-      const items = allData.filter(d => {
-        if (jenisList && !jenisList.includes(d.jenis)) return false;
-        const hasPel = (d.tglPelaksanaan && d.tglPelaksanaan !== '-') ||
-                       (d.hariPelaksanaan && d.hariPelaksanaan !== '-');
+      var jenisList = jenisVal === 'all' ? null : jenisVal.split(',');
+      var items = allData.filter(function(d) {
+        if (jenisList && jenisList.indexOf(d.jenis) === -1) return false;
+        var hasPel = (d.tglPelaksanaan && d.tglPelaksanaan !== '-') ||
+                     (d.hariPelaksanaan && d.hariPelaksanaan !== '-');
         if (!hasPel && rangeVal !== 'all') return false;
         if (maxDate !== null) {
-          const dt = parseTglPelaksanaan(d.tglPelaksanaan);
+          var dt = parseTglPelaksanaan(d.tglPelaksanaan);
           if (!dt) return rangeVal !== '0';
           dt.setHours(0,0,0,0);
           if (dt < today) return false;
@@ -932,27 +1047,27 @@
         }
         return true;
       });
-      items.sort((a,b) => {
-        const da = parseTglPelaksanaan(a.tglPelaksanaan) || new Date(9999,0,1);
-        const db = parseTglPelaksanaan(b.tglPelaksanaan) || new Date(9999,0,1);
+      items.sort(function(a,b) {
+        var da = parseTglPelaksanaan(a.tglPelaksanaan) || new Date(9999,0,1);
+        var db = parseTglPelaksanaan(b.tglPelaksanaan) || new Date(9999,0,1);
         return da - db;
       });
       document.getElementById('agendaCount').textContent = items.length + ' kegiatan';
-      const tbody = document.getElementById('agendaBody');
+      var tbody = document.getElementById('agendaBody');
       if (!items.length) {
         tbody.innerHTML = '<tr><td colspan="6" class="agenda-empty">Tidak ada kegiatan untuk filter ini.</td></tr>';
         return;
       }
-      tbody.innerHTML = items.map(d => {
-        const htw = [
+      tbody.innerHTML = items.map(function(d) {
+        var htw = [
           d.hariPelaksanaan && d.hariPelaksanaan !== '-' ? d.hariPelaksanaan : '',
           d.tglPelaksanaan && d.tglPelaksanaan !== '-' ? d.tglPelaksanaan : '',
           d.waktuPelaksanaan && d.waktuPelaksanaan !== '-' ? d.waktuPelaksanaan : ''
         ].filter(Boolean).join('<br>');
-        let tempat = d.tempat || '';
+        var tempat = d.tempat || '';
         if (d.ketTempat && d.ketTempat !== '-') tempat += (tempat?'<br>':'') + d.ketTempat;
-        const disp = d.disposisi && d.disposisi !== '-' ? d.disposisi : '–';
-        const link = d.scan
+        var disp = d.disposisi && d.disposisi !== '-' ? d.disposisi : '–';
+        var link = d.scan
           ? '<a class="link-surat" href="' + esc(d.scan) + '" target="_blank" rel="noopener">Lihat surat ↗</a>' : '–';
         return '<tr>' +
           '<td><strong>' + esc(d.asal) + '</strong></td>' +
@@ -967,18 +1082,18 @@
 
     function openPreview(mode) {
       previewMode = mode;
-      const capture = document.getElementById('agendaCapture');
-      const wrap = document.getElementById('previewWrap');
-      const waDiv = document.getElementById('previewWAText');
-      const title = document.getElementById('previewTitle');
-      const btn = document.getElementById('previewActionBtn');
+      var capture = document.getElementById('agendaCapture');
+      var wrap = document.getElementById('previewWrap');
+      var waDiv = document.getElementById('previewWAText');
+      var title = document.getElementById('previewTitle');
+      var btn = document.getElementById('previewActionBtn');
       if (mode === 'png') {
         title.textContent = 'Preview Gambar Agenda';
         btn.textContent = '📷 Unduh PNG';
         wrap.style.display = 'block';
         waDiv.style.display = 'none';
         wrap.innerHTML = '';
-        const clone = capture.cloneNode(true);
+        var clone = capture.cloneNode(true);
         clone.id = 'agendaCapturePreview';
         wrap.appendChild(clone);
       } else {
@@ -986,19 +1101,19 @@
         btn.textContent = '📲 Bagikan ke WA';
         wrap.style.display = 'none';
         waDiv.style.display = 'block';
-        const items = [];
-        document.querySelectorAll('#agendaBody tr').forEach(tr => {
-          const tds = tr.querySelectorAll('td');
+        var items = [];
+        document.querySelectorAll('#agendaBody tr').forEach(function(tr) {
+          var tds = tr.querySelectorAll('td');
           if (tds.length < 5) return;
-          const asal = tds[0].innerText.trim();
-          if (asal.includes('Tidak ada kegiatan')) return;
-          const waktu = tds[1].innerText.trim().replace(/\n/g, ' · ');
-          const tempat = tds[2].innerText.trim();
-          const isi = tds[3].innerText.trim();
-          const disp = tds[4].innerText.trim();
+          var asal = tds[0].innerText.trim();
+          if (asal.indexOf('Tidak ada kegiatan') !== -1) return;
+          var waktu = tds[1].innerText.trim().replace(/\n/g, ' · ');
+          var tempat = tds[2].innerText.trim();
+          var isi = tds[3].innerText.trim();
+          var disp = tds[4].innerText.trim();
           items.push('📌 *' + asal + '*\n🗓 ' + waktu + '\n📍 ' + tempat + '\n📝 ' + isi + '\n👤 ' + disp);
         });
-        const text = items.length
+        var text = items.length
           ? '*Agenda Sekretariat Dinas Kehutanan Provinsi Jawa Barat*\n\n' + items.join('\n\n') + '\n\n_Dibuat otomatis dari Agenda Surat Masuk_'
           : 'Tidak ada data agenda.';
         document.getElementById('waTextArea').value = text;
@@ -1011,10 +1126,10 @@
     }
     async function confirmPreviewAction() {
       if (previewMode === 'png') {
-        const el = document.getElementById('agendaCapture');
+        var el = document.getElementById('agendaCapture');
         try {
-          const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-          const a = document.createElement('a');
+          var canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+          var a = document.createElement('a');
           a.download = 'agenda-sekretariat-dishut-' + new Date().toISOString().slice(0,10) + '.png';
           a.href = canvas.toDataURL('image/png');
           a.click();
@@ -1023,21 +1138,21 @@
           alert('Gagal membuat gambar: ' + e.message);
         }
       } else if (previewMode === 'wa') {
-        const text = document.getElementById('waTextArea').value;
+        var text = document.getElementById('waTextArea').value;
         window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
         closePreview();
       }
     }
 
     function badgeJenis(j) {
-      const map = {'Undangan':'badge-undangan','Biasa':'badge-biasa','Permohonan':'badge-permohonan',
+      var map = {'Undangan':'badge-undangan','Biasa':'badge-biasa','Permohonan':'badge-permohonan',
         'Penting':'badge-penting','Segera':'badge-segera','Rahasia':'badge-rahasia','Surat Edaran':'badge-edaran'};
       return '<span class="badge ' + (map[j]||'badge-default') + '">' + esc(j) + '</span>';
     }
     function showDetail(no) {
-      const d = allData.find(x => x.no === no);
+      var d = allData.find(function(x) { return x.no === no; });
       if (!d) return;
-      let html =
+      var html =
         '<div class="detail-row"><span class="detail-label">No. Urut</span><span class="detail-value">' + d.no + '</span></div>' +
         '<div class="detail-row"><span class="detail-label">Tgl Terima</span><span class="detail-value">' + esc(d.tglTerima) + '</span></div>' +
         '<div class="detail-row"><span class="detail-label">Jenis</span><span class="detail-value">' + badgeJenis(d.jenis) + '</span></div>' +
@@ -1066,7 +1181,7 @@
 
     function switchTab(tab) {
       currentTab = tab;
-      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab===tab));
+      document.querySelectorAll('.tab').forEach(function(t) { t.classList.toggle('active', t.dataset.tab===tab); });
       document.getElementById('agendaPanel').style.display = tab==='tabel'?'block':'none';
       document.getElementById('semuaPanel').style.display = tab==='semua'?'block':'none';
       if (tab==='tabel') renderAgenda();
@@ -1074,10 +1189,14 @@
 
     function refreshData(){ loadData(); }
     function exportCSV() {
-      const h = ['No','Tgl Terima','Jenis','Nomor Surat','Asal','Isi Ringkas','Disposisi','Catatan','Tgl Pelaksanaan','Waktu','Tempat','Scan'];
-      const rows = filteredData.map(d => [d.no,d.tglTerima,d.jenis,d.nomorSurat,d.asal,d.isiRingkas,d.disposisi,d.catatan,d.tglPelaksanaan,d.waktuPelaksanaan,d.tempat,d.scan]);
-      const csv = [h].concat(rows).map(r => r.map(c => '"' + String(c||'').replace(/"/g,'""') + '"').join(',')).join('\n');
-      const a = document.createElement('a');
+      var h = ['No','Tgl Terima','Jenis','Nomor Surat','Asal','Isi Ringkas','Disposisi','Catatan','Tgl Pelaksanaan','Waktu','Tempat','Scan'];
+      var rows = filteredData.map(function(d) {
+        return [d.no,d.tglTerima,d.jenis,d.nomorSurat,d.asal,d.isiRingkas,d.disposisi,d.catatan,d.tglPelaksanaan,d.waktuPelaksanaan,d.tempat,d.scan];
+      });
+      var csv = [h].concat(rows).map(function(r) {
+        return r.map(function(c) { return '"' + String(c||'').replace(/"/g,'""') + '"'; }).join(',');
+      }).join('\n');
+      var a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
       a.download = 'agenda-sekretariat-' + new Date().toISOString().slice(0,10) + '.csv';
       a.click();
@@ -1085,7 +1204,7 @@
     function esc(s){ if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     function trunc(s,n){ if(!s)return''; return s.length>n?s.slice(0,n)+'…':s; }
 
-    document.addEventListener('keydown', e => {
+    document.addEventListener('keydown', function(e) {
       if (e.key==='Escape'){ closeModal(); closePreview(); }
     });
 
