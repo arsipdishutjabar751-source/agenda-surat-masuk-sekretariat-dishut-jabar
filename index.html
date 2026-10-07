@@ -708,14 +708,20 @@
     <div class="agenda-controls">
       <div class="ctrl-group">
         <label>Filter Tanggal Pelaksanaan</label>
-        <select id="agendaRange" onchange="renderAgenda()">
+        <select id="agendaRange" onchange="onAgendaRangeChange()">
           <option value="7">7 hari ke depan</option>
           <option value="0">Hari ini</option>
+          <option value="besok">Besok</option>
           <option value="3">3 hari ke depan</option>
           <option value="14">14 hari ke depan</option>
           <option value="30">30 hari ke depan</option>
+          <option value="tanggal">Pilih tanggal...</option>
           <option value="all">Semua undangan</option>
         </select>
+      </div>
+      <div class="ctrl-group" id="agendaDateWrap" style="display:none;">
+        <label>Tanggal</label>
+        <input type="date" id="agendaDate" onchange="renderAgenda()" style="padding:0.48rem 0.75rem;border:1.5px solid var(--border);border-radius:9px;font-size:0.78rem;font-family:inherit;background:#fafcfb;outline:none;" />
       </div>
       <div class="ctrl-group">
         <label>Jenis / Mode</label>
@@ -1251,12 +1257,41 @@
       });
     });
 
+    function onAgendaRangeChange() {
+      var v = document.getElementById('agendaRange').value;
+      var wrap = document.getElementById('agendaDateWrap');
+      if (v === 'tanggal') {
+        wrap.style.display = 'flex';
+        var inp = document.getElementById('agendaDate');
+        if (!inp.value) {
+          // default to today
+          var t = new Date();
+          inp.value = t.getFullYear() + '-' + String(t.getMonth()+1).padStart(2,'0') + '-' + String(t.getDate()).padStart(2,'0');
+        }
+      } else {
+        wrap.style.display = 'none';
+      }
+      renderAgenda();
+    }
     function renderAgenda() {
       var rangeVal = document.getElementById('agendaRange').value;
       var jenisVal = document.getElementById('agendaJenis').value;
       var today = new Date(); today.setHours(0,0,0,0);
+      var tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
       var maxDate = null;
-      if (rangeVal !== 'all') {
+      var onlyBesok = (rangeVal === 'besok');
+      var onlyHariIni = (rangeVal === '0');
+      var onlyTanggal = (rangeVal === 'tanggal');
+      var pickedDate = null;
+      if (onlyTanggal) {
+        var raw = document.getElementById('agendaDate').value; // yyyy-mm-dd
+        if (raw) {
+          var parts = raw.split('-');
+          pickedDate = new Date(parseInt(parts[0],10), parseInt(parts[1],10)-1, parseInt(parts[2],10));
+          pickedDate.setHours(0,0,0,0);
+        }
+      }
+      if (rangeVal !== 'all' && rangeVal !== 'besok' && rangeVal !== '0' && rangeVal !== 'tanggal') {
         maxDate = new Date(today);
         maxDate.setDate(maxDate.getDate() + parseInt(rangeVal,10));
       }
@@ -1265,17 +1300,21 @@
         if (jenisList && jenisList.indexOf(d.jenis) === -1) return false;
         var hasPel = (d.tglPelaksanaan && d.tglPelaksanaan !== '-') ||
                      (d.hariPelaksanaan && d.hariPelaksanaan !== '-');
-        if (!hasPel) return false; // agenda only shows items with schedule
+        if (!hasPel) return false;
         var dt = parseTglPelaksanaan(d.tglPelaksanaan);
-        // Always hide events that already passed (before today)
-        if (dt) {
-          dt.setHours(0,0,0,0);
-          if (dt < today) return false;
-          if (maxDate !== null && dt > maxDate) return false;
-        } else {
-          // Unparseable date: only show in "all" mode
-          if (rangeVal !== 'all') return false;
+        if (!dt) {
+          return rangeVal === 'all';
         }
+        dt.setHours(0,0,0,0);
+        if (onlyTanggal) {
+          if (!pickedDate) return false;
+          return dt.getTime() === pickedDate.getTime();
+        }
+        // Hide past events for range filters
+        if (dt < today) return false;
+        if (onlyHariIni) return dt.getTime() === today.getTime();
+        if (onlyBesok) return dt.getTime() === tomorrow.getTime();
+        if (maxDate !== null && dt > maxDate) return false;
         return true;
       });
       items.sort(function(a,b) {
