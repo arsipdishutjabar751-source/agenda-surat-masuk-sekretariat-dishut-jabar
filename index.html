@@ -631,7 +631,7 @@
       try {
         const res = await fetch(SHEET_URL + '&_t=' + Date.now());
         const text = await res.text();
-        const jsonStr = text.match(/google\\.visualization\\.Query\\.setResponse\\(([\\s\\S]*)\\);?/)[1];
+        const jsonStr = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?/)[1];
         const data = JSON.parse(jsonStr);
         const rows = data.table.rows || [];
         allData = rows.map((r, idx) => {
@@ -685,14 +685,14 @@
         'januari':0,'februari':1,'maret':2,'april':3,'mei':4,'juni':5,
         'juli':6,'agustus':7,'september':8,'oktober':9,'november':10,'desember':11
       };
-      const m = str.match(/(\\d{1,2})\\s*(?:–|-|s\\.?d\\.?)?\\s*(?:\\d{1,2}\\s+)?([A-Za-z]+)\\s+(\\d{4})/i);
+      const m = str.match(/(\d{1,2})\s*(?:–|-|s\.?d\.?)?\s*(?:\d{1,2}\s+)?([A-Za-z]+)\s+(\d{4})/i);
       if (m) {
         const day = parseInt(m[1],10);
         const mon = bulanMap[m[2].toLowerCase()];
         const year = parseInt(m[3],10);
         if (mon !== undefined) return new Date(year, mon, day);
       }
-      const m2 = str.match(/(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})/);
+      const m2 = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
       if (m2) return new Date(+m2[3], +m2[2]-1, +m2[1]);
       return null;
     }
@@ -788,7 +788,7 @@
         if (d.disposisi && d.disposisi !== '-') {
           d.disposisi.split(/[,;]/).forEach(x => { const t = x.trim(); if (t) dispSet.add(t); });
         }
-        const m = d.tglTerima.match(/(\\d{2})\\/(\\d{2})\\/(\\d{4})/);
+        const m = d.tglTerima.match(/(\d{2})\/(\d{2})\/(\d{4})/);
         if (m) {
           const bn = ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
           bulanSet.add(m[3] + '-' + m[2] + '|' + bn[+m[2]] + ' ' + m[3]);
@@ -817,7 +817,7 @@
         if (jenis && d.jenis !== jenis) return false;
         if (disp && !(d.disposisi||'').includes(disp)) return false;
         if (bulan) {
-          const m = d.tglTerima.match(/(\\d{2})\\/(\\d{2})\\/(\\d{4})/);
+          const m = d.tglTerima.match(/(\d{2})\/(\d{2})\/(\d{4})/);
           if (!m || (m[3]+'-'+m[2]) !== bulan) return false;
         }
         if (q) {
@@ -845,7 +845,7 @@
       document.getElementById('statFiltered').textContent = filteredData.length.toLocaleString('id-ID');
       const t = new Date();
       const cnt = allData.filter(d => {
-        const m = d.tglTerima.match(/(\\d{2})\\/(\\d{2})\\/(\\d{4})/);
+        const m = d.tglTerima.match(/(\d{2})\/(\d{2})\/(\d{4})/);
         return m && +m[1]===t.getDate() && +m[2]===(t.getMonth()+1) && +m[3]===t.getFullYear();
       }).length;
       document.getElementById('statToday').textContent = cnt;
@@ -992,16 +992,16 @@
           if (tds.length < 5) return;
           const asal = tds[0].innerText.trim();
           if (asal.includes('Tidak ada kegiatan')) return;
-          const waktu = tds[1].innerText.trim().replace(/\\n/g, ' · ');
+          const waktu = tds[1].innerText.trim().replace(/\n/g, ' · ');
           const tempat = tds[2].innerText.trim();
           const isi = tds[3].innerText.trim();
           const disp = tds[4].innerText.trim();
-          items.push('📌 *' + asal + '*\\n🗓 ' + waktu + '\\n📍 ' + tempat + '\\n📝 ' + isi + '\\n👤 ' + disp);
+          items.push('📌 *' + asal + '*\n🗓 ' + waktu + '\n📍 ' + tempat + '\n📝 ' + isi + '\n👤 ' + disp);
         });
         const text = items.length
-          ? '*Agenda Sekretariat Dinas Kehutanan Provinsi Jawa Barat*\\n\\n' + items.join('\\n\\n') + '\\n\\n_Dibuat otomatis dari Agenda Surat Masuk_'
+          ? '*Agenda Sekretariat Dinas Kehutanan Provinsi Jawa Barat*\n\n' + items.join('\n\n') + '\n\n_Dibuat otomatis dari Agenda Surat Masuk_'
           : 'Tidak ada data agenda.';
-        document.getElementById('waTextArea').value = text.replace(/\\\\n/g, '\\n');
+        document.getElementById('waTextArea').value = text;
       }
       document.getElementById('previewModal').classList.add('show');
     }
@@ -1076,9 +1076,9 @@
     function exportCSV() {
       const h = ['No','Tgl Terima','Jenis','Nomor Surat','Asal','Isi Ringkas','Disposisi','Catatan','Tgl Pelaksanaan','Waktu','Tempat','Scan'];
       const rows = filteredData.map(d => [d.no,d.tglTerima,d.jenis,d.nomorSurat,d.asal,d.isiRingkas,d.disposisi,d.catatan,d.tglPelaksanaan,d.waktuPelaksanaan,d.tempat,d.scan]);
-      const csv = [h].concat(rows).map(r => r.map(c => '"' + String(c||'').replace(/"/g,'""') + '"').join(',')).join('\\n');
+      const csv = [h].concat(rows).map(r => r.map(c => '"' + String(c||'').replace(/"/g,'""') + '"').join(',')).join('\n');
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob(['\\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+      a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
       a.download = 'agenda-sekretariat-' + new Date().toISOString().slice(0,10) + '.csv';
       a.click();
     }
