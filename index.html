@@ -488,6 +488,91 @@
 
     .agenda-empty { text-align: center; padding: 2.2rem; color: var(--muted); }
 
+    .surat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin: 0.5rem 1rem 1rem;
+    }
+    .surat-card {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.3rem;
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid #e8eeeb;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .surat-card:hover { background: #f3faf7; }
+    .surat-card:last-child { border-bottom: none; }
+    .sc-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .sc-left { min-width: 0; flex: 1; }
+    .sc-no {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 0.1rem;
+    }
+    .sc-asal {
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .sc-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.25rem;
+      flex-shrink: 0;
+    }
+    .sc-isi {
+      font-size: 0.82rem;
+      color: #334155;
+      line-height: 1.4;
+    }
+    .sc-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.7rem;
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-top: 0.1rem;
+      align-items: center;
+    }
+    .sc-meta span { display: inline-flex; align-items: center; gap: 0.2rem; }
+    .sc-nomor {
+      font-family: ui-monospace, monospace;
+      font-size: 0.72rem;
+      color: #64748b;
+    }
+    .sc-link {
+      font-size: 0.74rem;
+      color: #0d9488;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .sc-link:hover { text-decoration: underline; }
+    .sc-disp {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #dc2626;
+      background: #fef2f2;
+      padding: 0.12rem 0.4rem;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+
     /* ===== MODALS ===== */
     .modal-overlay {
       position: fixed; inset: 0;
@@ -542,6 +627,8 @@
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 640px) {
+      .surat-list { margin: 0.4rem 0.5rem 1rem; }
+      .surat-card { padding: 0.7rem 0.75rem; }
       .header { padding: 0.55rem 0.75rem; }
       .header-title h1 { font-size: 0.88rem; }
       .logo-wrap img { width: 36px; height: 36px; }
@@ -679,22 +766,8 @@
         <div class="spinner"></div>
         Memuat data dari Google Sheet...
       </div>
-      <div class="table-wrap" id="tableSection" style="display:none;">
-        <table>
-          <thead>
-            <tr>
-              <th data-sort="no">No ↕</th>
-              <th data-sort="tgl">Tgl Terima ↕</th>
-              <th data-sort="jenis">Jenis ↕</th>
-              <th data-sort="nomor">Nomor Surat ↕</th>
-              <th data-sort="asal">Asal Surat ↕</th>
-              <th data-sort="isi">Isi Ringkas ↕</th>
-              <th data-sort="disposisi">Disposisi ↕</th>
-              <th>Scan</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
+      <div id="tableSection" style="display:none;">
+        <div class="surat-list" id="tableBody"></div>
       </div>
       <div class="pagination" id="pagination" style="display:none;">
         <div class="page-info" id="pageInfo"></div>
@@ -857,34 +930,100 @@
       return dt.getDate()===t.getDate() && dt.getMonth()===t.getMonth() && dt.getFullYear()===t.getFullYear();
     }
 
+    function parseJamMulai(waktuStr) {
+      if (!waktuStr || waktuStr === '-') return null;
+      // Match patterns like 08.00, 08:00, 8.30, 09.00 WIB
+      var m = String(waktuStr).match(/(\d{1,2})[.:](\d{2})/);
+      if (!m) return null;
+      return { h: parseInt(m[1], 10), m: parseInt(m[2], 10) };
+    }
+    function parseJamSelesai(waktuStr) {
+      if (!waktuStr || waktuStr === '-') return null;
+      var s = String(waktuStr).toLowerCase();
+      if (s.indexOf('selesai') !== -1) return null; // open-ended
+      // second time in range e.g. 09.00 - 12.00 or 08.00 s.d. 16.00
+      var times = s.match(/(\d{1,2})[.:](\d{2})/g);
+      if (times && times.length >= 2) {
+        var m = times[1].match(/(\d{1,2})[.:](\d{2})/);
+        if (m) return { h: parseInt(m[1], 10), m: parseInt(m[2], 10) };
+      }
+      return null;
+    }
+    function isCurrentlyOngoing(dt, waktuStr) {
+      if (!dt || !isToday(dt)) return false;
+      var now = new Date();
+      var start = parseJamMulai(waktuStr);
+      if (!start) {
+        // No time info: treat as ongoing during office hours roughly 07-17, else as hari ini only
+        var h = now.getHours();
+        return h >= 7 && h < 17;
+      }
+      var startMin = start.h * 60 + start.m;
+      var nowMin = now.getHours() * 60 + now.getMinutes();
+      if (nowMin < startMin) return false; // not started yet
+      var end = parseJamSelesai(waktuStr);
+      if (end) {
+        var endMin = end.h * 60 + end.m;
+        if (nowMin > endMin) return false; // already finished
+      } else {
+        // "s.d. selesai" or no end: ongoing until 18:00
+        if (nowMin > 18 * 60) return false;
+      }
+      return true;
+    }
     function buildLiveItems() {
       var today = new Date(); today.setHours(0,0,0,0);
-      var hariIni = [], mendatang = [];
+      var berlangsung = [], hariIni = [], mendatang = [];
       allData.forEach(function(d) {
         if (['Undangan','Permohonan'].indexOf(d.jenis) === -1) return;
         var hasPel = (d.tglPelaksanaan && d.tglPelaksanaan !== '-') ||
                      (d.hariPelaksanaan && d.hariPelaksanaan !== '-');
         if (!hasPel) return;
         var dt = parseTglPelaksanaan(d.tglPelaksanaan);
+        if (!dt) return; // skip unparseable dates to avoid wrong counts
+        dt.setHours(0,0,0,0);
         var item = Object.assign({}, d, {_date: dt});
-        if (dt && isToday(dt)) hariIni.push(item);
-        else if (dt && dt > today) mendatang.push(item);
-        else if (!dt && hasPel) mendatang.push(item);
+        if (dt.getTime() < today.getTime()) return; // past - skip
+        if (dt.getTime() === today.getTime()) {
+          hariIni.push(item);
+          if (isCurrentlyOngoing(dt, d.waktuPelaksanaan)) {
+            berlangsung.push(item);
+          }
+        } else if (dt.getTime() > today.getTime()) {
+          mendatang.push(item);
+        }
       });
-      var byDate = function(a,b) { return (a._date||new Date(9999,0,1)) - (b._date||new Date(9999,0,1)); };
-      hariIni.sort(byDate);
+      var byTime = function(a, b) {
+        var sa = parseJamMulai(a.waktuPelaksanaan);
+        var sb = parseJamMulai(b.waktuPelaksanaan);
+        var ma = sa ? sa.h * 60 + sa.m : 0;
+        var mb = sb ? sb.h * 60 + sb.m : 0;
+        if (ma !== mb) return ma - mb;
+        return (a._date || 0) - (b._date || 0);
+      };
+      var byDate = function(a,b) {
+        var dd = (a._date||new Date(9999,0,1)) - (b._date||new Date(9999,0,1));
+        if (dd !== 0) return dd;
+        return byTime(a, b);
+      };
+      berlangsung.sort(byTime);
+      hariIni.sort(byTime);
       mendatang.sort(byDate);
-      var berlangsung = hariIni.slice(0, Math.min(3, hariIni.length));
       document.getElementById('badgeBerlangsung').textContent = berlangsung.length + ' berlangsung';
       document.getElementById('badgeHariIni').textContent = hariIni.length + ' hari ini';
       document.getElementById('badgeMendatang').textContent = mendatang.length + ' mendatang';
+      // Carousel: ongoing first, then rest of today (not ongoing), then upcoming
       liveItems = [];
-      berlangsung.forEach(function(d) { liveItems.push(Object.assign({}, d, {status:'BERLANGSUNG', statusClass:'status-berlangsung'})); });
+      var ongoingIds = {};
+      berlangsung.forEach(function(d) {
+        ongoingIds[d.no] = true;
+        liveItems.push(Object.assign({}, d, {status:'BERLANGSUNG', statusClass:'status-berlangsung'}));
+      });
       hariIni.forEach(function(d) {
-        if (berlangsung.indexOf(d) === -1)
+        if (!ongoingIds[d.no])
           liveItems.push(Object.assign({}, d, {status:'HARI INI', statusClass:'status-hariini'}));
       });
-      mendatang.slice(0,12).forEach(function(d) {
+      mendatang.slice(0, 15).forEach(function(d) {
         liveItems.push(Object.assign({}, d, {status:'MENDATANG', statusClass:'status-mendatang'}));
       });
       liveIndex = 0;
@@ -1049,19 +1188,30 @@
       var start = (currentPage-1)*perPage;
       var page = filteredData.slice(start, start+perPage);
       if (!page.length) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted);">Tidak ada data.</td></tr>';
+        tbody.innerHTML = '<div class="agenda-empty">Tidak ada data.</div>';
       } else {
         tbody.innerHTML = page.map(function(d) {
-          return '<tr onclick="showDetail(' + d.no + ')" style="cursor:pointer;">' +
-            '<td><strong>' + d.no + '</strong></td>' +
-            '<td>' + esc(d.tglTerima) + '</td>' +
-            '<td>' + badgeJenis(d.jenis) + '</td>' +
-            '<td style="font-family:monospace;font-size:0.75rem;">' + esc(d.nomorSurat) + '</td>' +
-            '<td>' + esc(trunc(d.asal,36)) + '</td>' +
-            '<td>' + esc(trunc(d.isiRingkas,50)) + '</td>' +
-            '<td style="font-size:0.75rem;color:var(--muted);">' + esc(trunc(d.disposisi,26)) + '</td>' +
-            '<td>' + (d.scan ? '<a class="scan-link" href="' + esc(d.scan) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Buka ↗</a>' : '–') + '</td>' +
-            '</tr>';
+          var disp = d.disposisi && d.disposisi !== '-' ? d.disposisi : '';
+          var link = d.scan
+            ? '<a class="sc-link" href="' + esc(d.scan) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Lihat surat ↗</a>'
+            : '';
+          return '<div class="surat-card" onclick="showDetail(' + d.no + ')" title="Klik untuk detail">' +
+            '<div class="sc-top">' +
+              '<div class="sc-left">' +
+                '<div class="sc-no">No. ' + d.no + ' · ' + esc(d.tglTerima) + '</div>' +
+                '<div class="sc-asal">' + esc(d.asal || '–') + '</div>' +
+              '</div>' +
+              '<div class="sc-right">' +
+                badgeJenis(d.jenis) +
+                (disp ? '<span class="sc-disp">' + esc(trunc(disp, 28)) + '</span>' : '') +
+              '</div>' +
+            '</div>' +
+            '<div class="sc-isi">' + esc(d.isiRingkas || '–') + '</div>' +
+            '<div class="sc-meta">' +
+              (d.nomorSurat ? '<span class="sc-nomor">' + esc(d.nomorSurat) + '</span>' : '') +
+              (link ? '<span>' + link + '</span>' : '') +
+            '</div>' +
+          '</div>';
         }).join('');
       }
       document.getElementById('loading').style.display = 'none';
@@ -1304,6 +1454,10 @@
 
     document.getElementById('agendaPanel').style.display = 'block';
     loadData();
+    // Refresh live status every minute so "berlangsung" stays accurate
+    setInterval(function() {
+      if (allData.length) buildLiveItems();
+    }, 60000);
   </script>
 </body>
 </html>
