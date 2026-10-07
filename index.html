@@ -417,6 +417,75 @@
     .disp-red { color: #dc2626; font-weight: 700; }
     .link-surat { color: #0d9488; font-weight: 600; text-decoration: none; font-size: 0.72rem; }
     .link-surat:hover { text-decoration: underline; }
+
+    /* Minimalist agenda cards - no horizontal scroll */
+    .agenda-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .agenda-card {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid #e8eeeb;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .agenda-card:hover { background: #f3faf7; }
+    .agenda-card:last-child { border-bottom: none; }
+    .ac-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .ac-asal {
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .ac-disp {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #dc2626;
+      white-space: nowrap;
+      flex-shrink: 0;
+      background: #fef2f2;
+      padding: 0.15rem 0.45rem;
+      border-radius: 6px;
+    }
+    .ac-isi {
+      font-size: 0.82rem;
+      color: #334155;
+      line-height: 1.4;
+    }
+    .ac-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem 0.75rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.15rem;
+    }
+    .ac-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+    .ac-link {
+      font-size: 0.75rem;
+      color: #0d9488;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .ac-link:hover { text-decoration: underline; }
+    .agenda-list-header {
+      display: none;
+    }
+
     .agenda-empty { text-align: center; padding: 2.2rem; color: var(--muted); }
 
     /* ===== MODALS ===== */
@@ -552,7 +621,7 @@
     <div class="agenda-controls">
       <div class="ctrl-group">
         <label>Filter Tanggal Pelaksanaan</label>
-        <select id="agendaRange">
+        <select id="agendaRange" onchange="renderAgenda()">
           <option value="7">7 hari ke depan</option>
           <option value="0">Hari ini</option>
           <option value="3">3 hari ke depan</option>
@@ -563,7 +632,7 @@
       </div>
       <div class="ctrl-group">
         <label>Jenis / Mode</label>
-        <select id="agendaJenis">
+        <select id="agendaJenis" onchange="renderAgenda()">
           <option value="Undangan,Permohonan">Undangan &amp; Permohonan</option>
           <option value="Undangan">Undangan saja</option>
           <option value="Permohonan">Permohonan saja</option>
@@ -571,7 +640,6 @@
         </select>
       </div>
       <div class="agenda-btns">
-        <button class="btn btn-green" onclick="renderAgenda()">🔄 Tampilkan</button>
         <button class="btn btn-teal" onclick="openPreview('png')">📷 Unduh Gambar PNG</button>
         <button class="btn btn-teal" onclick="openPreview('wa')">📲 Share Teks WA</button>
         <button class="btn btn-gray" onclick="window.print()">🖨️ Cetak / PDF</button>
@@ -586,22 +654,8 @@
         </div>
         <div class="megaphone">📢</div>
       </div>
-      <div style="overflow-x:auto;">
-        <table class="agenda-table">
-          <thead>
-            <tr>
-              <th style="width:18%">Asal Surat</th>
-              <th style="width:16%">Hari / Tanggal / Waktu</th>
-              <th style="width:16%">Tempat</th>
-              <th style="width:28%">Isi Ringkas</th>
-              <th style="width:12%">Disposisi</th>
-              <th style="width:10%">Link Surat</th>
-            </tr>
-          </thead>
-          <tbody id="agendaBody">
-            <tr><td colspan="6" class="agenda-empty">Klik <strong>Tampilkan</strong> untuk memuat agenda.</td></tr>
-          </tbody>
-        </table>
+      <div class="agenda-list" id="agendaBody">
+        <div class="agenda-empty">Memuat agenda...</div>
       </div>
     </div>
   </div>
@@ -1061,13 +1115,16 @@
         if (jenisList && jenisList.indexOf(d.jenis) === -1) return false;
         var hasPel = (d.tglPelaksanaan && d.tglPelaksanaan !== '-') ||
                      (d.hariPelaksanaan && d.hariPelaksanaan !== '-');
-        if (!hasPel && rangeVal !== 'all') return false;
-        if (maxDate !== null) {
-          var dt = parseTglPelaksanaan(d.tglPelaksanaan);
-          if (!dt) return rangeVal !== '0';
+        if (!hasPel) return false; // agenda only shows items with schedule
+        var dt = parseTglPelaksanaan(d.tglPelaksanaan);
+        // Always hide events that already passed (before today)
+        if (dt) {
           dt.setHours(0,0,0,0);
           if (dt < today) return false;
-          if (dt > maxDate) return false;
+          if (maxDate !== null && dt > maxDate) return false;
+        } else {
+          // Unparseable date: only show in "all" mode
+          if (rangeVal !== 'all') return false;
         }
         return true;
       });
@@ -1079,28 +1136,34 @@
       document.getElementById('agendaCount').textContent = items.length + ' kegiatan';
       var tbody = document.getElementById('agendaBody');
       if (!items.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="agenda-empty">Tidak ada kegiatan untuk filter ini.</td></tr>';
+        tbody.innerHTML = '<div class="agenda-empty">Tidak ada kegiatan untuk filter ini.</div>';
         return;
       }
       tbody.innerHTML = items.map(function(d) {
-        var htw = [
+        var waktuParts = [
           d.hariPelaksanaan && d.hariPelaksanaan !== '-' ? d.hariPelaksanaan : '',
           d.tglPelaksanaan && d.tglPelaksanaan !== '-' ? d.tglPelaksanaan : '',
           d.waktuPelaksanaan && d.waktuPelaksanaan !== '-' ? d.waktuPelaksanaan : ''
-        ].filter(Boolean).join('<br>');
+        ].filter(Boolean);
+        var waktu = waktuParts.join(' · ');
         var tempat = d.tempat || '';
-        if (d.ketTempat && d.ketTempat !== '-') tempat += (tempat?'<br>':'') + d.ketTempat;
-        var disp = d.disposisi && d.disposisi !== '-' ? d.disposisi : '–';
+        if (d.ketTempat && d.ketTempat !== '-') tempat += (tempat ? ' · ' : '') + d.ketTempat;
+        var disp = d.disposisi && d.disposisi !== '-' ? d.disposisi : '';
         var link = d.scan
-          ? '<a class="link-surat" href="' + esc(d.scan) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Lihat surat ↗</a>' : '–';
-        return '<tr onclick="showDetail(' + d.no + ')" style="cursor:pointer;" title="Klik untuk detail surat">' +
-          '<td><strong>' + esc(d.asal) + '</strong></td>' +
-          '<td>' + (htw||'–') + '</td>' +
-          '<td>' + (tempat||'–') + '</td>' +
-          '<td>' + (esc(d.isiRingkas)||'–') + '</td>' +
-          '<td class="disp-red">' + esc(disp) + '</td>' +
-          '<td>' + link + '</td>' +
-          '</tr>';
+          ? '<a class="ac-link" href="' + esc(d.scan) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Lihat surat ↗</a>'
+          : '';
+        return '<div class="agenda-card" onclick="showDetail(' + d.no + ')" title="Klik untuk detail">' +
+          '<div class="ac-top">' +
+            '<div class="ac-asal">' + esc(d.asal) + '</div>' +
+            (disp ? '<div class="ac-disp">' + esc(disp) + '</div>' : '') +
+          '</div>' +
+          '<div class="ac-isi">' + esc(d.isiRingkas || '–') + '</div>' +
+          '<div class="ac-meta">' +
+            (waktu ? '<span>🕐 ' + esc(waktu) + '</span>' : '') +
+            (tempat ? '<span>📍 ' + esc(tempat) + '</span>' : '') +
+            (link ? '<span>' + link + '</span>' : '') +
+          '</div>' +
+        '</div>';
       }).join('');
     }
 
@@ -1126,16 +1189,19 @@
         wrap.style.display = 'none';
         waDiv.style.display = 'block';
         var items = [];
-        document.querySelectorAll('#agendaBody tr').forEach(function(tr) {
-          var tds = tr.querySelectorAll('td');
-          if (tds.length < 5) return;
-          var asal = tds[0].innerText.trim();
-          if (asal.indexOf('Tidak ada kegiatan') !== -1) return;
-          var waktu = tds[1].innerText.trim().replace(/\n/g, ' · ');
-          var tempat = tds[2].innerText.trim();
-          var isi = tds[3].innerText.trim();
-          var disp = tds[4].innerText.trim();
-          items.push('📌 *' + asal + '*\n🗓 ' + waktu + '\n📍 ' + tempat + '\n📝 ' + isi + '\n👤 ' + disp);
+        document.querySelectorAll('#agendaBody .agenda-card').forEach(function(card) {
+          var asal = (card.querySelector('.ac-asal') || {}).innerText || '';
+          var isi = (card.querySelector('.ac-isi') || {}).innerText || '';
+          var disp = (card.querySelector('.ac-disp') || {}).innerText || '';
+          var meta = card.querySelectorAll('.ac-meta span');
+          var waktu = '', tempat = '';
+          meta.forEach(function(s) {
+            var t = s.innerText.trim();
+            if (t.indexOf('🕐') === 0) waktu = t.replace('🕐','').trim();
+            else if (t.indexOf('📍') === 0) tempat = t.replace('📍','').trim();
+          });
+          if (!asal || asal.indexOf('Tidak ada') !== -1) return;
+          items.push('📌 *' + asal.trim() + '*\n🗓 ' + waktu + '\n📍 ' + tempat + '\n📝 ' + isi.trim() + '\n👤 ' + disp.trim());
         });
         var text = items.length
           ? '*Agenda Sekretariat Dinas Kehutanan Provinsi Jawa Barat*\n\n' + items.join('\n\n') + '\n\n_Dibuat otomatis dari Agenda Surat Masuk_'
