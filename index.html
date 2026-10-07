@@ -1382,6 +1382,8 @@
           var asal = (card.querySelector('.ac-asal') || {}).innerText || '';
           var isi = (card.querySelector('.ac-isi') || {}).innerText || '';
           var disp = (card.querySelector('.ac-disp') || {}).innerText || '';
+          var linkEl = card.querySelector('.ac-link');
+          var linkSurat = linkEl ? (linkEl.getAttribute('href') || '') : '';
           var meta = card.querySelectorAll('.ac-meta span');
           var waktu = '', tempat = '';
           meta.forEach(function(s) {
@@ -1390,7 +1392,9 @@
             else if (t.indexOf('📍') === 0) tempat = t.replace('📍','').trim();
           });
           if (!asal || asal.indexOf('Tidak ada') !== -1) return;
-          items.push('📌 *' + asal.trim() + '*\n🗓 ' + waktu + '\n📍 ' + tempat + '\n📝 ' + isi.trim() + '\n👤 ' + disp.trim());
+          var block = '📌 *' + asal.trim() + '*\n🗓 ' + waktu + '\n📍 ' + tempat + '\n📝 ' + isi.trim() + '\n👤 ' + disp.trim();
+          if (linkSurat) block += '\n🔗 ' + linkSurat;
+          items.push(block);
         });
         var text = items.length
           ? '*Agenda Sekretariat Dinas Kehutanan Provinsi Jawa Barat*\n\n' + items.join('\n\n') + '\n\n_Dibuat otomatis dari Agenda Surat Masuk_'
