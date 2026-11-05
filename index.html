@@ -1341,12 +1341,14 @@
         var link = d.scan
           ? '<a class="ac-link" href="' + esc(d.scan) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Lihat surat ↗</a>'
           : '';
-        return '<div class="agenda-card" data-no="' + d.no + '" onclick="showDetail(' + d.no + ')" title="Klik untuk detail">' +
+        var catAttr = (d.catatan && d.catatan !== '-') ? esc(d.catatan) : '';
+        return '<div class="agenda-card" data-no="' + d.no + '" data-catatan="' + catAttr + '" data-link="' + esc(d.scan || '') + '" onclick="showDetail(' + d.no + ')" title="Klik untuk detail">' +
           '<div class="ac-top">' +
             '<div class="ac-asal">' + esc(d.asal) + '</div>' +
             (disp ? '<div class="ac-disp">' + esc(disp) + '</div>' : '') +
           '</div>' +
           '<div class="ac-isi">' + esc(d.isiRingkas || '–') + '</div>' +
+          (catAttr ? '<div class="ac-catatan" style="font-size:0.75rem;color:#64748b;margin-top:0.1rem;">📋 ' + catAttr + '</div>' : '') +
           '<div class="ac-meta">' +
             (waktu ? '<span>🕐 ' + esc(waktu) + '</span>' : '') +
             (tempat ? '<span>📍 ' + esc(tempat) + '</span>' : '') +
@@ -1383,25 +1385,37 @@
           var isi = (card.querySelector('.ac-isi') || {}).innerText || '';
           var disp = (card.querySelector('.ac-disp') || {}).innerText || '';
           var linkEl = card.querySelector('.ac-link');
-          var linkSurat = linkEl ? (linkEl.getAttribute('href') || '') : '';
+          var linkSurat = (linkEl && linkEl.getAttribute('href')) || card.getAttribute('data-link') || '';
           var noAttr = card.getAttribute('data-no');
-          var catatan = '';
-          if (noAttr) {
-            var found = allData.find(function(x) { return String(x.no) === String(noAttr); });
+          // Catatan: dari atribut kartu dulu, lalu fallback allData
+          var catatan = card.getAttribute('data-catatan') || '';
+          if ((!catatan || catatan === '-') && noAttr) {
+            var found = null;
+            for (var i = 0; i < allData.length; i++) {
+              if (String(allData[i].no) === String(noAttr)) { found = allData[i]; break; }
+            }
             if (found && found.catatan && found.catatan !== '-') catatan = found.catatan;
           }
+          if (catatan === '-') catatan = '';
           var meta = card.querySelectorAll('.ac-meta span');
           var waktu = '', tempat = '';
           meta.forEach(function(s) {
             var t = s.innerText.trim();
-            if (t.indexOf('🕐') === 0) waktu = t.replace('🕐','').trim();
-            else if (t.indexOf('📍') === 0) tempat = t.replace('📍','').trim();
+            if (t.indexOf('🕐') === 0 || t.charCodeAt(0) === 128336) waktu = t.replace(/^🕐\s*/,'').trim();
+            else if (t.indexOf('📍') === 0 || t.charCodeAt(0) === 128205) tempat = t.replace(/^📍\s*/,'').trim();
           });
           if (!asal || asal.indexOf('Tidak ada') !== -1) return;
-          var block = '📌 *' + asal.trim() + '*\n🗓 ' + waktu + '\n📍 ' + tempat + '\n📝 ' + isi.trim() + '\n👤 ' + disp.trim();
-          if (catatan) block += '\n📋 Catatan: ' + catatan;
-          if (linkSurat) block += '\n🔗 ' + linkSurat;
-          items.push(block);
+          var lines = [
+            '📌 *' + asal.trim() + '*',
+            '🗓 ' + waktu,
+            '📍 ' + tempat,
+            '📝 ' + isi.trim(),
+            '👤 ' + disp.trim()
+          ];
+          // Selalu tampilkan baris catatan (isi atau "-")
+          lines.push('📋 Catatan: ' + (catatan ? catatan : '-'));
+          if (linkSurat) lines.push('🔗 ' + linkSurat);
+          items.push(lines.join('\n'));
         });
         var text = items.length
           ? '*Agenda Sekretariat Dinas Kehutanan Provinsi Jawa Barat*\n\n' + items.join('\n\n') + '\n\n_Dibuat otomatis dari Agenda Surat Masuk_'
